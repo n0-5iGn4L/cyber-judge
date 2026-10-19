@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>【模拟示例】公共图书馆延时开放：怎样权衡便利与成本？ · 赛博判官</title>
+<meta name="description" content="本页是虚构的公共议题格式示例，不包含现实政策建议。假设某图书馆计划延时开放，需要比较读者需求、劳动安排和预算。">
+<meta name="generator" content="cyber-judge-template/1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%225%22%20y%3D%225%22%20width%3D%2254%22%20height%3D%2254%22%20fill%3D%22none%22%20stroke%3D%22%23a33124%22%20stroke-width%3D%225%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2244%22%20font-size%3D%2232%22%20text-anchor%3D%22middle%22%20fill%3D%22%23a33124%22%20font-family%3D%22serif%22%3E%E5%88%A4%3C%2Ftext%3E%3C%2Fsvg%3E">
+<style>
+/* ==========================================================================
+   赛博判官 · 热点议题报告模板
+   设计母题：卷宗书脊 + 判词批注
+   - 墨色书脊：固定左栏，承载刊名、争论点目录与阅读进度
+   - 纸面正文：暖纸底、宋体判词、黑体记录
+   - 朱批：只用于裁定、争论点编号、引用标签与印章
+   - 页边批注：支持度刻度与理由，正文右侧对齐
+   ========================================================================== */
+
+/* ---------- tokens ---------- */
+:root {
+  --paper: #f4f0e6;
+  --paper-2: #ece5d5;
+  --paper-3: #faf7ef;
+  --ink: #1c1915;
+  --ink-2: #3a342b;
+  --muted: #6a6153;
+  --rule: #d9cfbc;
+  --rule-2: #c3b7a0;
+  --red: #a33124;
+  --spine: #16130f;
+  --spine-fg: #efe8d9;
+  --spine-muted: #9a9182;
+
+  --serif: "Songti SC", "STSong", "Source Han Serif SC", "Noto Serif SC", "SimSun", "Noto Serif CJK SC", serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Microsoft YaHei UI", "Hiragino Sans GB", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  --mono: "SF Mono", "Cascadia Mono", "JetBrains Mono", "Consolas", "DejaVu Sans Mono", monospace;
+
+  --spine-w: 200px;
+  --main-w: 680px;
+  --note-w: 232px;
+  --gap: 56px;
+  --pad: 56px;
+
+  --fs-body: 17px;
+  --lh-body: 1.95;
+}
+
+/* ---------- reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+i, em { font-style: normal; }
+button { font: inherit; color: inherit; }
+
+::selection { background: var(--red); color: var(--paper); }
+
+:where(a, summary, button):focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+h2[tabindex="-1"]:focus-visible { outline: 2px solid var(--red); outline-offset: 6px; }
+
+/* ---------- utility ---------- */
+.mono { font-family: var(--mono); }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: fixed; top: 8px; left: 8px; z-index: 100;
+  padding: 10px 16px; background: var(--ink); color: var(--paper);
+  font-size: 13px; transform: translateY(-160%);
+}
+.skip:focus {
+  transform: none; background: var(--red); color: var(--paper);
+  outline-color: var(--paper);
+}
+.spine :where(a, summary, button):focus-visible,
+.topbar :where(a, summary, button):focus-visible { outline-color: #f2e4ca; }
+
+/* ==========================================================================
+   书脊
+   ========================================================================== */
+.spine {
+  position: fixed; inset: 0 auto 0 0; z-index: 40;
+  width: var(--spine-w);
+  background: var(--spine);
+  color: var(--spine-fg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.spine::after {
+  content: ""; position: absolute; top: 0; right: 0;
+  width: 2px; height: var(--progress, 0%);
+  background: var(--red);
+  transition: height .12s linear;
+}
+.spine-inner {
+  min-height: 100%;
+  display: flex; flex-direction: column;
+  padding: 30px 26px 26px;
+}
+.spine-brand { display: flex; flex-direction: column; gap: 14px; }
+.spine-kicker {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .34em;
+  color: var(--spine-muted); text-transform: uppercase;
+}
+.spine-word {
+  writing-mode: vertical-rl;
+  font-family: var(--serif); font-size: 34px; line-height: 1.06;
+  letter-spacing: .16em; color: var(--spine-fg);
+  margin-top: 4px;
+}
+.spine-rule { height: 1px; background: rgba(239,232,217,.18); margin: 26px 0 18px; }
+.spine-meta {
+  font-family: var(--mono); font-size: 10px; line-height: 1.9;
+  letter-spacing: .04em; color: var(--spine-muted);
+}
+.spine-meta b { color: var(--spine-fg); font-weight: 500; }
+.spine-nav { margin-top: 4px; display: flex; flex-direction: column; }
+.spine-nav a {
+  display: grid; grid-template-columns: 22px 1fr; gap: 8px;
+  padding: 7px 0; border-top: 1px solid rgba(239,232,217,.10);
+  color: var(--spine-muted);
+  font-size: 12px; line-height: 1.45; letter-spacing: .02em;
+  transition: color .15s;
+}
+.spine-nav a:first-child { border-top: 0; }
+.spine-nav a:hover { color: var(--spine-fg); }
+.spine-nav .n {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .04em;
+  padding-top: 2px; color: rgba(239,232,217,.42);
+}
+.spine-nav a[aria-current] { color: var(--spine-fg); }
+.spine-nav a[aria-current] .n { color: #d4574a; }
+.spine-nav a[aria-current] .t { position: relative; }
+.spine-nav a[aria-current] .t::before {
+  content: ""; position: absolute; left: -8px; top: .55em;
+  width: 3px; height: 3px; background: #d4574a;
+}
+.spine-foot { margin-top: auto; padding-top: 30px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.spine-top {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em;
+  color: var(--spine-muted); border-bottom: 1px solid rgba(239,232,217,.22); padding-bottom: 2px;
+}
+.spine-top:hover { color: var(--spine-fg); border-color: var(--spine-fg); }
+
+/* 印章 */
+.seal {
+  --seal: 74px;
+  width: var(--seal); height: var(--seal);
+  border: 2px solid var(--red);
+  color: var(--red);
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  place-items: center;
+  font-family: var(--serif); font-size: calc(var(--seal) * .27); line-height: 1;
+  letter-spacing: 0;
+  transform: rotate(-5deg);
+  opacity: .9;
+  mix-blend-mode: multiply;
+  user-select: none;
+}
+.seal.spine-seal {
+  --seal: 42px;
+  border-width: 1px;
+  color: #c4574a; border-color: #c4574a;
+  font-size: 12px; opacity: .85; transform: rotate(-6deg);
+}
+
+/* ==========================================================================
+   页框
+   ========================================================================== */
+.page { margin-left: var(--spine-w); }
+.wrap {
+  max-width: calc(var(--main-w) + var(--gap) + var(--note-w) + var(--pad) * 2);
+  margin: 0 auto;
+  padding-left: var(--pad); padding-right: var(--pad);
+}
+.prose { max-width: var(--main-w); }
+
+/* ---------- 顶栏 ---------- */
+.toprail {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+  padding: 26px 0 14px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em;
+  color: var(--muted);
+}
+.toprail .right { color: var(--ink-2); white-space: nowrap; }
+.toprail .dot { color: var(--red); padding: 0 .5em; }
+
+/* ==========================================================================
+   首屏
+   ========================================================================== */
+.hero { padding-bottom: 8px; }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, var(--main-w)) var(--note-w);
+  column-gap: var(--gap);
+  padding-top: 64px;
+  align-items: start;
+}
+.case-head { min-width: 0; }
+.case-subject {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; font-weight: 600; letter-spacing: .16em; line-height: 1.7;
+  color: var(--ink-2);
+}
+.case-subject::before {
+  content: ""; flex: none; width: 22px; height: 2px; background: var(--red);
+}
+.case-title {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(36px, 4.15vw, 58px);
+  line-height: 1.16; letter-spacing: .008em;
+  margin-top: 18px;
+  text-wrap: balance;
+}
+.case-title .q-line { display: block; }
+.case-title .q-line + .q-line { margin-top: .04em; }
+.hero-verdict {
+  margin-top: 40px;
+  border-left: 3px solid var(--red);
+  padding-left: 22px;
+  max-width: 620px;
+}
+.hero-verdict .label {
+  display: block;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em;
+  color: var(--red); margin-bottom: 9px;
+}
+.hero-verdict p {
+  font-family: var(--serif); font-size: 24px; line-height: 1.62;
+  letter-spacing: .01em;
+}
+.hero-summary {
+  margin-top: 30px; max-width: 610px;
+  font-size: 16.5px; line-height: 1.92; color: var(--ink-2);
+}
+.hero-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 22px; padding-top: 6px; }
+.hero-stamp { align-self: flex-end; }
+.hero-aside .aside-note {
+  font-family: var(--mono); font-size: 9.5px; line-height: 1.9;
+  letter-spacing: .05em; color: var(--muted); text-align: right;
+}
+
+/* ---------- 争论点索引 ---------- */
+.issue-index {
+  margin-top: 58px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.issue-index a {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 18px 18px 20px 0;
+  border-right: 1px solid var(--rule);
+  min-width: 0;
+  transition: background .15s;
+}
+.issue-index a:nth-child(4n), .issue-index a:last-child { border-right: 0; }
+.issue-index a:not(:nth-child(4n+1)) { padding-left: 18px; }
+.issue-index a:nth-child(n+5) { border-top: 1px solid var(--rule); }
+.issue-index a:hover { background: rgba(28,25,21,.035); }
+.issue-index .n {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--red);
+}
+.issue-index .t {
+  font-size: 14px; font-weight: 500; line-height: 1.5; letter-spacing: .01em;
+  color: var(--ink);
+}
+.issue-index a:hover .t { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+/* ==========================================================================
+   章节骨架
+   ========================================================================== */
+.sec { padding-top: 96px; }
+.eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em;
+  color: var(--red); margin-bottom: 12px;
+}
+.eyebrow::before { content: ""; width: 7px; height: 7px; background: var(--red); flex: none; }
+.sec-title {
+  font-size: 27px; font-weight: 600; line-height: 1.4; letter-spacing: .01em;
+  margin-bottom: 26px;
+}
+.sub-label {
+  display: flex; align-items: center; gap: 16px;
+  font-size: 12px; font-weight: 600; letter-spacing: .18em; color: var(--ink-2);
+  margin: 46px 0 18px;
+}
+.sub-label::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+/* ---------- 正文 ---------- */
+.body-text {
+  font-size: var(--fs-body); line-height: var(--lh-body);
+  color: var(--ink);
+  max-width: var(--main-w);
+}
+.body-text + .body-text { margin-top: 1.05em; }
+
+/* ---------- 时间线 ---------- */
+.timeline { max-width: var(--main-w); border-top: 1px solid var(--rule); }
+.timeline li {
+  display: grid; grid-template-columns: 148px minmax(0, 1fr);
+  gap: 24px;
+  padding: 20px 0 22px;
+  border-bottom: 1px solid var(--rule);
+}
+.t-date {
+  font-family: var(--mono); font-size: 12px; line-height: 1.7;
+  letter-spacing: .02em; color: var(--ink-2);
+  padding-top: 2px;
+  overflow-wrap: anywhere;
+}
+.t-date::before {
+  content: ""; display: inline-block; width: 6px; height: 6px;
+  background: var(--red); margin-right: 9px; vertical-align: 1px;
+}
+.t-title { font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+.t-text { font-size: 15px; line-height: 1.85; color: var(--ink-2); margin-top: 6px; }
+.t-text .cite { margin-left: 3px; }
+
+/* ---------- 各方角色 ---------- */
+.actors {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--rule);
+}
+.actors li {
+  padding: 18px 22px 6px 0;
+  border-right: 1px solid var(--rule);
+  min-width: 0;
+}
+.actors li:last-child { border-right: 0; }
+.actors li:not(:first-child) { padding-left: 22px; }
+.actor-name {
+  display: block;
+  font-family: var(--serif); font-size: 18px; line-height: 1.5; letter-spacing: .02em;
+}
+.actor-role {
+  display: block; margin-top: 8px;
+  font-size: 13px; line-height: 1.75; color: var(--muted);
+}
+
+/* ==========================================================================
+   争论点
+   ========================================================================== */
+.issue { padding-top: 104px; scroll-margin-top: 24px; }
+.issue:first-of-type { padding-top: 88px; }
+.issue-bar { display: flex; align-items: center; gap: 12px; }
+.issue-kicker {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: var(--red);
+}
+.issue-num {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .04em;
+  color: var(--paper); background: var(--red);
+  padding: 3px 8px 2px; line-height: 1.2;
+}
+.issue-bar .line { flex: 1; height: 1px; background: var(--rule-2); }
+.issue-q {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(26px, 2.7vw, 34px); line-height: 1.46; letter-spacing: .012em;
+  margin-top: 20px; max-width: 780px;
+}
+.verdict {
+  margin-top: 30px; border-left: 3px solid var(--red); padding-left: 22px;
+  max-width: 660px;
+}
+.verdict .label {
+  display: block;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: var(--red);
+  margin-bottom: 8px;
+}
+.verdict p {
+  font-family: var(--serif); font-size: 21px; line-height: 1.72; letter-spacing: .012em;
+}
+
+/* ---------- 论点：正文 + 页边批注 ---------- */
+.duo {
+  display: grid;
+  grid-template-columns: minmax(0, var(--main-w)) var(--note-w);
+  column-gap: var(--gap);
+  align-items: start;
+}
+.claims { margin-top: 34px; }
+.claim { padding-top: 26px; }
+.claim + .claim { border-top: 1px solid var(--rule); margin-top: 26px; }
+.speaker {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: .1em; color: var(--ink-2);
+  margin-bottom: 9px;
+}
+.speaker::before { content: ""; width: 6px; height: 6px; background: var(--ink); flex: none; }
+.claim-text {
+  font-size: 18.5px; line-height: 1.85; letter-spacing: .012em; color: var(--ink);
+  max-width: 34em;
+}
+.claim-note { padding-top: 26px; }
+.support { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.bars { display: inline-flex; gap: 3px; }
+.bars i {
+  width: 7px; height: 7px; border: 1px solid var(--rule-2); background: transparent;
+  display: block;
+}
+.bars i.on { background: var(--ink); border-color: var(--ink); }
+.support-mark {
+  width: 9px; height: 9px; display: block; flex: none;
+  border: 1px solid var(--ink); transform: rotate(45deg);
+}
+.support-mark.cross {
+  transform: none; border: 0;
+  background:
+    linear-gradient(45deg, transparent 44%, var(--red) 44%, var(--red) 56%, transparent 56%),
+    linear-gradient(-45deg, transparent 44%, var(--red) 44%, var(--red) 56%, transparent 56%);
+}
+.support-mark.open { border-style: dashed; transform: none; }
+.support-label {
+  font-size: 12px; font-weight: 600; letter-spacing: .12em; color: var(--ink);
+}
+.support-reason {
+  margin-top: 9px;
+  font-size: 13px; line-height: 1.8; color: var(--muted);
+}
+
+/* ---------- 理由 ---------- */
+.reasoning { margin-top: 42px; max-width: var(--main-w); }
+.reasoning .sub-label { margin-top: 0; }
+.reasoning-body {
+  border-left: 2px solid var(--ink);
+  padding-left: 26px;
+}
+.reasoning-body p { font-size: var(--fs-body); line-height: var(--lh-body); }
+.reasoning-body p + p { margin-top: 1em; }
+
+/* ---------- 判官短评 ---------- */
+.roast {
+  margin-top: 44px; max-width: calc(var(--main-w) + var(--note-w) + var(--gap));
+  background: var(--paper-2);
+  border-top: 1px solid var(--rule-2);
+  border-bottom: 1px solid var(--rule-2);
+  padding: 24px 30px 26px;
+  position: relative;
+}
+.roast::before {
+  content: ""; position: absolute; left: 0; top: -1px; bottom: -1px; width: 3px; background: var(--red);
+}
+.roast .label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: var(--red);
+}
+.roast .label::after { content: ""; width: 5px; height: 5px; background: var(--red); border-radius: 50%; }
+.roast p {
+  margin-top: 10px;
+  font-family: var(--serif); font-size: 22px; line-height: 1.72; letter-spacing: .014em;
+}
+
+/* ==========================================================================
+   结论
+   ========================================================================== */
+.conclusion-body { max-width: var(--main-w); }
+.conclusion-body p {
+  font-family: var(--serif); font-size: 20px; line-height: 1.86; letter-spacing: .012em;
+}
+.conclusion-body p + p { margin-top: 1.1em; }
+.questions { margin-top: 54px; max-width: var(--main-w); }
+.questions li {
+  display: grid; grid-template-columns: 34px 1fr; gap: 16px;
+  padding: 16px 0; border-top: 1px solid var(--rule);
+  font-size: 16px; line-height: 1.8;
+}
+.questions li:last-child { border-bottom: 1px solid var(--rule); }
+.questions .qn {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--red); padding-top: 4px;
+}
+
+/* ==========================================================================
+   判词卡
+   ========================================================================== */
+.share { margin-top: 76px; max-width: var(--main-w); }
+.share-cap {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em; color: var(--muted);
+  margin-bottom: 12px;
+}
+.share-card {
+  background: var(--paper-3);
+  border: 1px solid var(--ink-2);
+  padding: 30px 34px 26px;
+  position: relative;
+}
+.card-top {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em; color: var(--red);
+  padding-bottom: 16px; border-bottom: 1px solid var(--rule);
+}
+.card-top .date { color: var(--muted); letter-spacing: .08em; }
+.card-case {
+  font-size: 12px; font-weight: 600; letter-spacing: .16em; color: var(--ink-2);
+  margin-top: 20px;
+}
+.card-headline {
+  font-family: var(--serif); font-weight: 400;
+  font-size: 27px; line-height: 1.5; letter-spacing: .014em;
+  margin-top: 10px; padding-right: 26px;
+}
+.card-rows { margin-top: 22px; border-top: 1px solid var(--rule); }
+.card-rows li {
+  display: grid; grid-template-columns: 26px 104px minmax(0, 1fr); gap: 12px;
+  padding: 11px 0; border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.card-rows .n { font-family: var(--mono); font-size: 10px; color: var(--red); }
+.card-rows .k { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--ink-2); }
+.card-rows .v { font-size: 13.5px; line-height: 1.7; color: var(--ink); }
+.card-foot {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 18px;
+  margin-top: 22px;
+}
+.card-foot .meta { font-family: var(--mono); font-size: 9.5px; line-height: 1.9; letter-spacing: .06em; color: var(--muted); }
+.card-foot .meta b { color: var(--ink-2); font-weight: 500; }
+.card-seal { --seal: 52px; flex: none; }
+
+/* ==========================================================================
+   证据
+   ========================================================================== */
+.legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 42px; margin: 8px 0 34px; }
+.legend div { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: baseline; }
+.legend dt, .legend .k { font-size: 12px; font-weight: 600; letter-spacing: .1em; }
+.legend .d { font-size: 13px; line-height: 1.7; color: var(--muted); }
+
+.sources { max-width: calc(var(--main-w) + var(--note-w) + var(--gap)); border-top: 1px solid var(--ink); }
+.source {
+  display: grid; grid-template-columns: 74px minmax(0, 1fr);
+  gap: 22px;
+  padding: 26px 0 28px;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 28px;
+}
+.source:target { animation: flash 1.6s ease-out 1; }
+@keyframes flash {
+  0% { background: rgba(163,49,36,.10); }
+  100% { background: transparent; }
+}
+.src-id {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--red);
+  padding-top: 4px;
+}
+.src-title { font-size: 16px; font-weight: 600; line-height: 1.6; letter-spacing: .01em; }
+.src-meta {
+  margin-top: 6px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em; color: var(--muted);
+}
+.src-note { margin-top: 10px; font-size: 13.5px; line-height: 1.8; color: var(--ink-2); }
+.src-url {
+  display: inline-block; margin-top: 10px;
+  font-family: var(--mono); font-size: 11px; line-height: 1.7; letter-spacing: .01em;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-2);
+  overflow-wrap: anywhere; word-break: break-all;
+}
+.src-url:hover { color: var(--red); border-color: var(--red); }
+.src-url .ext { color: var(--red); }
+.src-refs {
+  margin-top: 12px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .04em; color: var(--muted);
+}
+.src-refs .k { color: var(--ink-2); }
+.src-refs a { color: var(--ink-2); border-bottom: 1px solid var(--rule-2); padding-bottom: 1px; }
+.src-refs a::before { content: "§"; color: var(--red); margin-right: 3px; font-size: 9.5px; }
+.src-refs a:hover { color: var(--red); border-color: var(--red); }
+
+.method { margin-top: 40px; max-width: calc(var(--main-w) + var(--note-w) + var(--gap)); border-top: 1px solid var(--rule); }
+.method summary {
+  cursor: pointer; list-style: none; padding: 16px 0;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; color: var(--ink-2);
+  display: flex; align-items: center; gap: 10px;
+}
+.method summary::-webkit-details-marker { display: none; }
+.method summary::before {
+  content: ""; width: 0; height: 0; flex: none;
+  border-left: 5px solid var(--red); border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+  transition: transform .15s;
+}
+.method[open] summary::before { transform: rotate(90deg); }
+.method summary:hover { color: var(--red); }
+.method-body { padding: 4px 0 20px; font-size: 14px; line-height: 1.9; color: var(--ink-2); max-width: 760px; }
+
+/* ==========================================================================
+   页脚
+   ========================================================================== */
+.foot {
+  margin-top: 80px; padding: 22px 0 56px;
+  border-top: 1px solid var(--ink);
+  display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; color: var(--muted);
+}
+.foot .mark { font-family: var(--sans); font-weight: 600; letter-spacing: .24em; color: var(--ink-2); font-size: 11px; }
+
+/* ---------- 引用标签 ---------- */
+.cite {
+  display: inline-block;
+  font-family: var(--mono); font-size: .55em; line-height: 1.5;
+  letter-spacing: .04em;
+  color: var(--red);
+  border: 1px solid rgba(163,49,36,.38);
+  padding: 0 4px;
+  margin-left: 4px;
+  vertical-align: .18em;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.cite:hover, .cite:focus-visible { background: var(--red); color: var(--paper); border-color: var(--red); }
+
+/* ---------- 返回原处 ---------- */
+.back-pill {
+  position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 12px);
+  z-index: 50; display: none; align-items: center; gap: 10px;
+  padding: 11px 20px;
+  background: var(--ink); color: var(--paper);
+  font-size: 12.5px; letter-spacing: .04em;
+  border: 0; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(28,25,21,.22);
+  opacity: 0; transition: opacity .18s, transform .18s;
+}
+.back-pill[data-show] { display: flex; opacity: 1; transform: translate(-50%, 0); }
+.back-pill .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em; color: #d4574a; }
+
+/* ==========================================================================
+   移动端
+   ========================================================================== */
+.topbar { display: none; }
+.toc-panel { display: none; }
+
+@media (max-width: 1220px) {
+  :root { --spine-w: 172px; --main-w: 640px; --note-w: 210px; --gap: 40px; --pad: 40px; }
+  .spine-inner { padding: 26px 20px 22px; }
+  .spine-word { font-size: 30px; }
+  .actors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .actors li:nth-child(2) { border-right: 0; }
+  .actors li:nth-child(n+3) { border-top: 1px solid var(--rule); padding-top: 18px; }
+}
+
+@media (max-width: 1020px) {
+  :root { --spine-w: 0px; --pad: 40px; }
+  .spine { display: none; }
+  .page { margin-left: 0; }
+  .topbar {
+    display: flex; align-items: center; gap: 14px;
+    position: sticky; top: 0; z-index: 45;
+    background: var(--spine); color: var(--spine-fg);
+    padding: 12px var(--pad);
+    font-size: 13px;
+  }
+  .topbar::after {
+    content: ""; position: absolute; left: 0; right: auto; bottom: 0;
+    width: var(--progress, 0%); height: 2px; background: var(--red);
+  }
+  .tb-mark { font-weight: 600; letter-spacing: .22em; font-size: 13px; }
+  .toprail { display: none; }
+  .tb-meta { font-family: var(--mono); font-size: 9.5px; letter-spacing: .04em; color: var(--spine-muted); white-space: nowrap; }
+  .toc-btn {
+    margin-left: auto;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+    border: 1px solid rgba(239,232,217,.3); padding: 5px 10px;
+    color: var(--spine-fg);
+  }
+  .toc-btn:hover { border-color: var(--spine-fg); }
+  .toc-panel { display: none; }
+  .toc-panel:target, .toc-panel.open {
+    display: block;
+    position: fixed; inset: 56px 0 0 0; z-index: 60;
+    background: var(--paper); color: var(--ink);
+    overflow-y: auto; overscroll-behavior: contain;
+    border-top: 1px solid var(--rule);
+  }
+  .toc-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 14px var(--pad) 12px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .2em; color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+  }
+  .toc-close { color: var(--ink-2); border-bottom: 1px solid var(--rule-2); padding-bottom: 1px; }
+  .toc-list a {
+    display: grid; grid-template-columns: 26px 1fr; gap: 10px;
+    padding: 14px var(--pad); font-size: 14px; border-bottom: 1px solid var(--rule);
+  }
+  .toc-list .n { font-family: var(--mono); font-size: 9.5px; color: var(--red); padding-top: 4px; }
+  .duo { display: block; }
+  .claim-note { padding-top: 12px; }
+  .claim-text { font-size: 18px; }
+  [data-nav], .source { scroll-margin-top: 74px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero-aside { display: none; }
+  .case-title { font-size: clamp(34px, 6vw, 52px); }
+  .issue-q { font-size: clamp(25px, 4.2vw, 32px); }
+}
+
+@media (max-width: 760px) {
+  :root { --pad: 22px; --fs-body: 16.5px; }
+  .hero-grid { padding-top: 38px; }
+  .case-subject { font-size: 11.5px; letter-spacing: .1em; }
+  .case-title { font-size: clamp(27px, 7.4vw, 40px); line-height: 1.22; margin-top: 14px; letter-spacing: .01em; }
+  .hero-verdict { margin-top: 28px; padding-left: 16px; }
+  .hero-verdict p { font-size: 20px; }
+  .hero-summary { margin-top: 22px; font-size: 15.5px; line-height: 1.9; }
+  .issue-index { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 38px; }
+  .issue-index a { padding: 14px 14px 16px 0; border: 0; border-right: 1px solid var(--rule); }
+  .issue-index a:nth-child(2n) { border-right: 0; }
+  .issue-index a:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .issue-index a:nth-child(odd) { padding-left: 0; }
+  .issue-index a:nth-child(even) { padding-left: 16px; }
+  .issue-index .t { font-size: 13.5px; }
+  .sec { padding-top: 64px; }
+  .sec-title { font-size: 22px; margin-bottom: 20px; }
+  .sub-label { margin-top: 34px; font-size: 11px; letter-spacing: .14em; }
+  .timeline li { grid-template-columns: 1fr; gap: 6px; padding: 16px 0 18px; }
+  .t-date { padding-top: 0; }
+  .actors { grid-template-columns: 1fr; }
+  .actors li { border-right: 0; padding: 14px 0 2px; }
+  .actors li:not(:first-child) { padding-left: 0; }
+  .actors li:nth-child(n+2) { border-top: 1px solid var(--rule); padding-top: 14px; }
+  .actor-role { margin-top: 4px; }
+  .issue { padding-top: 68px; }
+  .issue:first-of-type { padding-top: 60px; }
+  .issue-q { font-size: clamp(24px, 6.6vw, 30px); line-height: 1.42; margin-top: 16px; }
+  .verdict { margin-top: 22px; padding-left: 16px; }
+  .verdict p { font-size: 18px; line-height: 1.75; }
+  .claim-text { font-size: 17px; line-height: 1.8; }
+  .claim-note { border-left: 2px solid var(--rule); padding-left: 14px; margin-top: 14px; padding-top: 0; }
+  .support-reason { font-size: 12.5px; line-height: 1.75; }
+  .reasoning { margin-top: 34px; }
+  .reasoning-body { padding-left: 18px; }
+  .roast { margin-top: 34px; padding: 20px 18px 22px; }
+  .roast p { font-size: 19.5px; line-height: 1.7; }
+  .conclusion-body p { font-size: 18px; line-height: 1.85; }
+  .questions { margin-top: 40px; }
+  .questions li { font-size: 15px; grid-template-columns: 26px 1fr; gap: 10px; }
+  .share { margin-top: 52px; }
+  .share-card { padding: 22px 18px 20px; }
+  .card-headline { font-size: 22px; padding-right: 0; }
+  .card-rows li { grid-template-columns: 22px 90px minmax(0, 1fr); gap: 8px; }
+  .card-rows .v { font-size: 12.5px; }
+  .card-seal { --seal: 42px; }
+  .legend { grid-template-columns: 1fr; gap: 10px; }
+  .legend div { grid-template-columns: 84px 1fr; gap: 10px; }
+  .source { grid-template-columns: 46px minmax(0, 1fr); gap: 14px; padding: 20px 0 22px; }
+  .foot { flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 56px; }
+  .back-pill { bottom: 18px; padding: 10px 16px; font-size: 12px; }
+}
+
+@media (max-width: 400px) {
+  :root { --pad: 17px; }
+  .card-rows li { grid-template-columns: 22px 1fr; }
+  .card-rows .k { grid-column: 2; }
+  .card-rows .v { grid-column: 2; }
+}
+
+/* ==========================================================================
+   动效偏好
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* ==========================================================================
+   打印
+   ========================================================================== */
+@page { size: A4; margin: 17mm 15mm 18mm; }
+
+@media print {
+  :root {
+    --paper: #fff; --paper-2: #f4f2ee; --paper-3: #fff;
+    --ink: #000; --ink-2: #1a1a1a; --muted: #3a3a3a;
+    --rule: #c8c8c8; --rule-2: #999; --red: #7d1a11;
+    --fs-body: 10.5pt;
+  }
+  html { scroll-behavior: auto; }
+  body { background: #fff; color: #000; font-size: 10.5pt; line-height: 1.7; }
+  .spine, .topbar, .issue-index, .back-pill, .share-cap, .skip, .method summary::before { display: none !important; }
+  .toc-panel { display: none !important; }
+  .page { margin-left: 0; }
+  .wrap { max-width: none; padding: 0; }
+  .prose, .body-text, .timeline, .actors, .reasoning, .questions, .conclusion-body, .duo { max-width: none; }
+  .duo { display: block; }
+  .claim-note { padding-top: 6px; }
+  .support-reason { max-width: 130mm; }
+  .hero-grid { grid-template-columns: 1fr; padding-top: 0; }
+  .hero-aside { display: none; }
+  .case-title { font-size: 25pt; line-height: 1.25; margin-top: 10pt; }
+  .hero-verdict { margin-top: 14pt; }
+  .hero-verdict p { font-size: 13pt; }
+  .hero-summary { font-size: 10.5pt; margin-top: 10pt; }
+  .sec { padding-top: 16mm; }
+  .sec-title { font-size: 17pt; margin-bottom: 6mm; }
+  .eyebrow { font-size: 8pt; }
+  .issue { padding-top: 14mm; break-inside: auto; }
+  .issue-q { font-size: 16pt; margin-top: 8pt; max-width: none; }
+  .verdict { margin-top: 10pt; }
+  .verdict p { font-size: 12pt; }
+  .claim-text { font-size: 11.5pt; max-width: none; }
+  .roast { margin-top: 8mm; background: #f4f2ee !important; padding: 12pt 14pt; max-width: none; break-inside: avoid; }
+  .roast p { font-size: 13pt; }
+  .conclusion-body p { font-size: 12pt; }
+  .share-card { max-width: none; break-inside: auto; }
+  .card-rows li { break-inside: avoid; }
+  .card-headline { font-size: 15pt; }
+  .sources, .method { max-width: none; }
+  .source { break-inside: avoid; }
+  .src-url { word-break: break-all; }
+  details > *:not(summary) { display: block !important; }
+  .method summary {
+    display: block !important; font-family: var(--sans); font-size: 9.5pt;
+    font-weight: 600; letter-spacing: .06em; color: #000; padding: 5mm 0 2mm;
+  }
+  .method summary::before { display: none !important; }
+  h1, h2, h3 { break-after: avoid; }
+  .claim, .verdict, .questions li, .legend div { break-inside: avoid; }
+  .foot { margin-top: 12mm; padding-bottom: 0; }
+  a { color: #000; }
+  .cite { border-color: #999; color: #000; vertical-align: baseline; font-size: 8pt; }
+}
+
+</style>
+</head>
+<body id="top">
+<a class="skip" href="#main">跳到正文</a>
+<button class="back-pill" type="button" aria-label="返回刚才的阅读位置"><span class="k">返回</span>刚才的位置</button>
+
+<aside class="spine" aria-label="报告信息与目录">
+  <div class="spine-inner">
+    <div class="spine-brand">
+      <span class="spine-kicker">Cyber Judge</span>
+      <span class="spine-word">赛博判官</span>
+    </div>
+    <div class="spine-rule" aria-hidden="true"></div>
+    <div class="spine-meta">公共议题<br>材料截至 <b>2026-01-01</b><br>3 项争论点 · 2 件证据</div>
+    <nav class="spine-nav" aria-label="本页目录">
+      <a href="#facts" data-nav="facts"><span class="n">00</span><span class="t">事实</span></a>
+      <a href="#issue-demand" data-nav="issue-demand"><span class="n">01</span><span class="t">需求证据</span></a>
+      <a href="#issue-labor" data-nav="issue-labor"><span class="n">02</span><span class="t">劳动安排</span></a>
+      <a href="#issue-options" data-nav="issue-options"><span class="n">03</span><span class="t">方案比较</span></a>
+      <a href="#conclusion" data-nav="conclusion"><span class="n">04</span><span class="t">结论</span></a>
+      <a href="#sources" data-nav="sources"><span class="n">05</span><span class="t">证据</span></a>
+    </nav>
+    <div class="spine-foot">
+      <a class="spine-top" href="#top">↑ 页首</a>
+    </div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <a class="tb-mark" href="#top">赛博判官</a>
+  <span class="tb-meta">材料截至 2026-01-01</span>
+  <a class="toc-btn" href="#toc-panel" aria-controls="toc-panel">目录</a>
+</header>
+
+<nav class="toc-panel" id="toc-panel" aria-label="本页目录">
+  <div class="toc-head"><span>目录</span><a class="toc-close" href="#top">关闭</a></div>
+  <div class="toc-list">
+    <a href="#facts" data-nav="facts"><span class="n">00</span><span class="t">事实</span></a>
+      <a href="#issue-demand" data-nav="issue-demand"><span class="n">01</span><span class="t">需求证据</span></a>
+      <a href="#issue-labor" data-nav="issue-labor"><span class="n">02</span><span class="t">劳动安排</span></a>
+      <a href="#issue-options" data-nav="issue-options"><span class="n">03</span><span class="t">方案比较</span></a>
+      <a href="#conclusion" data-nav="conclusion"><span class="n">04</span><span class="t">结论</span></a>
+      <a href="#sources" data-nav="sources"><span class="n">05</span><span class="t">证据</span></a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="wrap">
+    <main id="main">
+    <header class="hero">
+    <div class="toprail">
+      <div class="left">公共议题 · 公开材料分析</div>
+      <div class="right">材料截至 2026-01-01<span class="dot">/</span>3 项争论点<span class="dot">/</span>2 件证据</div>
+    </div>
+    <div class="hero-grid">
+      <div class="case-head">
+        <h1 class="case-title">
+          <span class="case-subject">【模拟示例】图书馆延时开放</span>
+          <span class="q-line">多开两小时，</span>
+          <span class="q-line">成本由谁承担？</span>
+        </h1>
+        <div class="hero-verdict">
+          <span class="label">核心判断</span>
+          <p>先做可评估的试点，比直接全面延时更有依据。</p>
+        </div>
+        <p class="hero-summary">本页是虚构的公共议题格式示例，不包含现实政策建议。假设某图书馆计划延时开放，需要比较读者需求、劳动安排和预算。</p>
+      </div>
+      <aside class="hero-aside" aria-hidden="true">
+        <div class="seal hero-stamp"><span>赛</span><span>博</span><span>判</span><span>官</span></div>
+      </aside>
+    </div>
+    <nav class="issue-index" aria-label="争论点索引">
+      <a href="#issue-demand"><span class="n">01</span><span class="t">需求证据</span></a>
+      <a href="#issue-labor"><span class="n">02</span><span class="t">劳动安排</span></a>
+      <a href="#issue-options"><span class="n">03</span><span class="t">方案比较</span></a>
+    </nav>
+  </header>
+
+    <section class="sec" id="facts" data-nav="facts" aria-labelledby="facts-h">
+    <div class="eyebrow">事实</div>
+    <h2 class="sec-title" id="facts-h">起因与经过</h2>
+    <div class="prose">
+      <p class="body-text">模拟设定：一份读者意见汇总提出晚间需求，预算草案列出延时所需增加的值班支出，但没有完整的晚间客流数据。<a class="cite" id="c1" href="#source-P1" title="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）" aria-label="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）">P1</a><a class="cite" id="c2" href="#source-P2" title="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）" aria-label="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）">P2</a></p>
+    </div>
+    
+    <h3 class="sub-label">各方角色</h3>
+    <ul class="actors">
+      <li>
+        <span class="actor-name">模拟读者</span>
+        <span class="actor-role">希望下班后有更多到馆时间。</span>
+      </li>
+      <li>
+        <span class="actor-name">模拟工作人员</span>
+        <span class="actor-role">关心排班、工作时长与补偿。</span>
+      </li>
+      <li>
+        <span class="actor-name">模拟管理方</span>
+        <span class="actor-role">统筹服务、预算和试点评估。</span>
+      </li>
+    </ul>
+  </section>
+
+    <section class="issue" id="issue-demand" data-nav="issue-demand" aria-labelledby="q-demand">
+    <div class="issue-bar">
+      <span class="issue-kicker">争论点</span>
+      <span class="issue-num">01</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <h2 class="issue-q" id="q-demand">意见征集足以证明普遍需求吗？</h2>
+    <div class="verdict">
+      <span class="label">裁定</span>
+      <p>它证明存在具体需求，但不足以估计整体需求规模。</p>
+    </div>
+    <div class="claims">
+      <h3 class="sub-label">各方论点与支持度</h3>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">模拟支持者</p>
+    <p class="claim-text">读者留言说明延时开放有需求。<a class="cite" id="c3" href="#source-P1" title="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）" aria-label="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）">P1</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持有限">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class=""></i></span><span class="support-label" title="支持有限：部分材料相符，关键连接仍依赖推断或来源单一。">支持有限</span>
+    </div>
+    <p class="support-reason">意见能够发现需求，非随机样本难以估计比例。</p>
+  </div>
+</div>
+    </div>
+    <div class="reasoning">
+      <h3 class="sub-label">为什么这样判断</h3>
+      <div class="reasoning-body">
+        <p>方案设计应先理解哪些读者需要服务，再用试点客流检验规模。<a class="cite" id="c4" href="#source-P1" title="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）" aria-label="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）">P1</a></p>
+      </div>
+    </div>
+    
+  </section>
+
+    <section class="issue" id="issue-labor" data-nav="issue-labor" aria-labelledby="q-labor">
+    <div class="issue-bar">
+      <span class="issue-kicker">争论点</span>
+      <span class="issue-num">02</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <h2 class="issue-q" id="q-labor">服务便利应如何与工作条件权衡？</h2>
+    <div class="verdict">
+      <span class="label">裁定</span>
+      <p>新增服务应配置相应的人力与补偿。</p>
+    </div>
+    <div class="claims">
+      <h3 class="sub-label">各方论点与支持度</h3>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">本报告意见</p>
+    <p class="claim-text">不能把延时服务成本全部转移给工作人员。</p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="规范判断">
+      <span class="support-mark" aria-hidden="true"></span><span class="support-label" title="规范判断：评价原则类主张，不按事实支持度计。">规范判断</span>
+    </div>
+    <p class="support-reason">采取改善公共服务与合理劳动条件并重的原则。</p>
+  </div>
+</div>
+    </div>
+    <div class="reasoning">
+      <h3 class="sub-label">为什么这样判断</h3>
+      <div class="reasoning-body">
+        <p>预算草案已经包含新增值班支出，方案比较应把它算进去，而非假设延时无成本。<a class="cite" id="c5" href="#source-P2" title="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）" aria-label="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）">P2</a></p>
+      </div>
+    </div>
+    
+  </section>
+
+    <section class="issue" id="issue-options" data-nav="issue-options" aria-labelledby="q-options">
+    <div class="issue-bar">
+      <span class="issue-kicker">争论点</span>
+      <span class="issue-num">03</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <h2 class="issue-q" id="q-options">全面延时、有限试点和维持现状，哪个更有理由？</h2>
+    <div class="verdict">
+      <span class="label">裁定</span>
+      <p>有限试点目前更值得支持：能检验需求，同时控制新增支出；代价是暂时无法覆盖所有读者。</p>
+    </div>
+    <div class="claims">
+      <h3 class="sub-label">各方论点与支持度</h3>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">本报告意见</p>
+    <p class="claim-text">先选择有限时段试点，公开评估后再扩展。</p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="规范判断">
+      <span class="support-mark" aria-hidden="true"></span><span class="support-label" title="规范判断：评价原则类主张，不按事实支持度计。">规范判断</span>
+    </div>
+    <p class="support-reason">在需求规模不明的前提下，优先选择能获得信息且成本可控的方案。</p>
+  </div>
+</div>
+    </div>
+    <div class="reasoning">
+      <h3 class="sub-label">为什么这样判断</h3>
+      <div class="reasoning-body">
+        <p>维持现状省去新增支出，但保留晚间需求缺口；全面延时覆盖更广，却在需求未明时承担全部成本。试点兼顾服务与学习价值。<a class="cite" id="c6" href="#source-P1" title="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）" aria-label="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）">P1</a><a class="cite" id="c7" href="#source-P2" title="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）" aria-label="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）">P2</a></p>
+      </div>
+    </div>
+    
+  </section>
+
+    <section class="sec" id="conclusion" data-nav="conclusion" aria-labelledby="conclusion-h">
+    <div class="eyebrow">结论</div>
+    <h2 class="sec-title" id="conclusion-h">本庭判断</h2>
+    <div class="conclusion-body">
+      <p>在给定设定下，有限试点比全面推行更适合检验需求和成本。试点需同时统计实际使用、额外支出与排班影响，不能只计算开门时长。<a class="cite" id="c8" href="#source-P1" title="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）" aria-label="证据 P1：【模拟材料】读者意见摘要（模拟日期 2026-01-01）">P1</a><a class="cite" id="c9" href="#source-P2" title="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）" aria-label="证据 P2：【模拟材料】预算草案（模拟日期 2026-01-01）">P2</a></p>
+    </div>
+    <div class="questions">
+      <h3 class="sub-label">最值得继续追问</h3>
+      <ol>
+        <li><span class="qn">01</span><span>晚间到馆需求有多稳定？</span></li>
+        <li><span class="qn">02</span><span>新增服务能否在合理劳动安排下持续？</span></li>
+      </ol>
+    </div>
+  </section>
+
+    <figure class="share" id="card">
+    <figcaption class="share-cap"><span>判词卡</span><span>截图即可分享</span></figcaption>
+    <div class="share-card">
+      <div class="card-top"><span>赛博判官 · 判词摘要</span><span class="date">材料截至 2026-01-01</span></div>
+      <p class="card-case">【模拟示例】图书馆延时开放</p>
+      <p class="card-headline">先做可评估的试点，比直接全面延时更有依据。</p>
+      <ol class="card-rows">
+        <li>
+          <span class="n">01</span>
+          <span class="k">需求证据</span>
+          <span class="v">它证明存在具体需求，但不足以估计整体需求规模。</span>
+        </li>
+        <li>
+          <span class="n">02</span>
+          <span class="k">劳动安排</span>
+          <span class="v">新增服务应配置相应的人力与补偿。</span>
+        </li>
+        <li>
+          <span class="n">03</span>
+          <span class="k">方案比较</span>
+          <span class="v">有限试点目前更值得支持：能检验需求，同时控制新增支出；代价是暂时无法覆盖所有读者。</span>
+        </li>
+      </ol>
+      <div class="card-foot">
+        <p class="meta">证据 <b>P1 P2</b><br>3 项争论点 · 完整推理与来源见正文</p>
+        <div class="seal card-seal" aria-hidden="true"><span>赛</span><span>博</span><span>判</span><span>官</span></div>
+      </div>
+    </div>
+  </figure>
+
+    <section class="sec" id="sources" data-nav="sources" aria-labelledby="sources-h">
+    <div class="eyebrow">证据</div>
+    <h2 class="sec-title" id="sources-h">来源与采集</h2>
+    <h3 class="sub-label">支持度标注</h3>
+    <div class="legend">
+      <div><span class="k">支持较强</span><span class="d">直接材料与主张相符，关键反证不足以推翻。</span></div>
+      <div><span class="k">支持有限</span><span class="d">部分材料相符，关键连接仍依赖推断或来源单一。</span></div>
+      <div><span class="k">支持不足</span><span class="d">提出了说法，但没有支撑它的关键证据。</span></div>
+      <div><span class="k">有明确反证</span><span class="d">可核对材料与主张直接冲突。</span></div>
+      <div><span class="k">暂无法判断</span><span class="d">缺少决定性材料，现有解释难以区分。</span></div>
+      <div><span class="k">规范判断</span><span class="d">评价原则类主张，不按事实支持度计。</span></div>
+    </div>
+    <h3 class="sub-label">证据清单</h3>
+    <ol class="sources">
+    <li class="source" id="source-P1">
+      <div class="src-id">P1</div>
+      <div class="src-body">
+        <h3 class="src-title">【模拟材料】读者意见摘要</h3>
+        <div class="src-meta">模拟日期 2026-01-01 · 虚构格式示例</div>
+        <p class="src-note">演示设定：部分意见提出延时需求，样本并非随机抽取。 本条是作者编写的演示设定，链接为占位，不是现实证据。</p>
+        <a class="src-url" href="https://example.org/p1" target="_blank" rel="noopener noreferrer">https://example.org/p1<span class="ext"> ↗</span></a>
+        <div class="src-refs"><span class="k">被引用于</span><a href="#c1">起因</a><a href="#c3">争论点 01</a><a href="#c6">争论点 03</a><a href="#c8">结论</a></div>
+      </div>
+    </li>
+    <li class="source" id="source-P2">
+      <div class="src-id">P2</div>
+      <div class="src-body">
+        <h3 class="src-title">【模拟材料】预算草案</h3>
+        <div class="src-meta">模拟日期 2026-01-01 · 虚构格式示例</div>
+        <p class="src-note">演示设定：延时需要增加值班支出，尚未给出实际试点结果。 本条是作者编写的演示设定，链接为占位，不是现实证据。</p>
+        <a class="src-url" href="https://example.org/p2" target="_blank" rel="noopener noreferrer">https://example.org/p2<span class="ext"> ↗</span></a>
+        <div class="src-refs"><span class="k">被引用于</span><a href="#c2">起因</a><a href="#c5">争论点 02</a><a href="#c7">争论点 03</a><a href="#c9">结论</a></div>
+      </div>
+    </li>
+    </ol>
+    <details class="method">
+      <summary>采集与方法说明</summary>
+      <div class="method-body">模拟公共议题，仅验证分支数据和模板显示。未执行真实政策研究，也不代表此分支已通过真实议题的独立验证。</div>
+    </details>
+  </section>
+    </main>
+    <footer class="foot">
+      <div><span class="mark">赛博判官</span> · 公共议题报告</div>
+      <div>材料截至 2026-01-01 · 静态页面，可离线阅读</div>
+    </footer>
+  </div>
+</div>
+
+<script>
+/* 赛博判官报告页 · 渐进增强脚本
+   无 JS 时：正文、目录锚点、证据锚点、折叠与方法说明均可读可用。
+   有 JS 时：增加阅读进度、目录当前位置、证据跳转后的返回按钮。
+*/
+(function () {
+  'use strict';
+
+  var doc = document;
+  var root = doc.documentElement;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 阅读进度 ---------- */
+  var spine = doc.querySelector('.spine');
+  var topbar = doc.querySelector('.topbar');
+
+  function setProgress() {
+    var max = root.scrollHeight - window.innerHeight;
+    var p = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+    var v = p.toFixed(2) + '%';
+    if (spine) spine.style.setProperty('--progress', v);
+    if (topbar) topbar.style.setProperty('--progress', v);
+  }
+
+  /* ---------- 目录当前位置 ---------- */
+  var sections = Array.prototype.slice.call(doc.querySelectorAll('section[data-nav]'));
+  var links = Array.prototype.slice.call(doc.querySelectorAll('a[data-nav]'));
+  var currentId = null;
+
+  function setCurrent() {
+    if (!sections.length) return;
+    var line = window.innerHeight * 0.32;
+    var cur = sections[0].id;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].getBoundingClientRect().top <= line) cur = sections[i].id;
+    }
+    if (cur === currentId) return;
+    currentId = cur;
+    links.forEach(function (a) {
+      if (a.getAttribute('data-nav') === cur) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      ticking = false;
+      setProgress();
+      setCurrent();
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  setProgress();
+  setCurrent();
+
+  /* ---------- 证据跳转后的返回按钮 ---------- */
+  var pill = doc.querySelector('.back-pill');
+  var lastY = null;
+  var lastCite = null;
+
+  doc.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a.cite') : null;
+    if (!a || !pill) return;
+    lastCite = a;
+    lastY = window.scrollY;
+    window.setTimeout(function () {
+      if (lastY === null) return;
+      pill.setAttribute('data-show', '');
+    }, 40);
+  });
+
+  if (pill) {
+    pill.addEventListener('click', function () {
+      var y = lastY === null ? 0 : lastY;
+      pill.removeAttribute('data-show');
+      lastY = null;
+      window.scrollTo({ top: Math.max(0, y - 24), behavior: 'auto' });
+      if (lastCite) lastCite.focus({ preventScroll: true });
+    });
+  }
+
+  doc.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (pill && pill.hasAttribute('data-show')) {
+        pill.removeAttribute('data-show');
+        lastY = null;
+      }
+      if (toc && (toc.classList.contains('open') || location.hash === '#toc-panel')) {
+        closeToc();
+        if (tocBtn) tocBtn.focus();
+      }
+    }
+  });
+
+  /* ---------- 移动端目录面板 ---------- */
+  var toc = doc.querySelector('.toc-panel');
+  var tocBtn = doc.querySelector('.toc-btn');
+
+  function closeToc() {
+    if (toc) toc.classList.remove('open');
+    if (tocBtn) tocBtn.setAttribute('aria-expanded', 'false');
+    if (location.hash === '#toc-panel') history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  if (tocBtn && toc) {
+    tocBtn.setAttribute('aria-expanded', location.hash === '#toc-panel' ? 'true' : 'false');
+    tocBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      toc.classList.add('open');
+      tocBtn.setAttribute('aria-expanded', 'true');
+      var close = toc.querySelector('.toc-close');
+      if (close) close.focus();
+    });
+    toc.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      if (a.classList.contains('toc-close')) {
+        e.preventDefault();
+        if (location.hash === '#toc-panel') history.pushState(null, '', location.pathname + location.search);
+        tocBtn.focus();
+      }
+      closeToc();
+    });
+    doc.addEventListener('click', function (e) {
+      if (!toc.classList.contains('open')) return;
+      if (toc.contains(e.target) || tocBtn.contains(e.target)) return;
+      closeToc();
+    });
+  }
+
+  /* ---------- 目录跳转：柔和滚动，保留地址栏锚点 ---------- */
+  doc.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[data-nav]') : null;
+    if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var href = a.getAttribute('href') || '';
+    if (href.charAt(0) !== '#') return;
+    var el = doc.querySelector(href);
+    if (!el) return;
+    e.preventDefault();
+    var bar = window.innerWidth <= 1020 ? 64 : 12;
+    var top = el.getBoundingClientRect().top + window.scrollY - bar;
+    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+    closeToc();
+    if (history.pushState) history.pushState(null, '', href);
+    var heading = el.querySelector('h2') || el;
+    heading.setAttribute('tabindex', '-1');
+    heading.focus({ preventScroll: true });
+  });
+
+  /* ---------- 打印：展开全部折叠区 ---------- */
+  var printState = [];
+  window.addEventListener('beforeprint', function () {
+    printState = Array.prototype.map.call(doc.querySelectorAll('details'), function (d) {
+      var state = [d, d.open]; d.open = true; return state;
+    });
+  });
+  window.addEventListener('afterprint', function () {
+    printState.forEach(function (state) { state[0].open = state[1]; });
+    printState = [];
+  });
+})();
+
+</script>
+</body>
+</html>

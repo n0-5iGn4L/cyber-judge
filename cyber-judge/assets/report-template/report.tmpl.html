@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>{{TITLE}} · 赛博判官</title>
+<meta name="description" content="{{DESC}}">
+<meta name="generator" content="cyber-judge-template/1.0">
+<link rel="icon" href="{{ICON}}">
+<style>
+{{CSS}}
+</style>
+</head>
+<body id="top">
+<a class="skip" href="#main">跳到正文</a>
+<button class="back-pill" type="button" aria-label="返回刚才的阅读位置"><span class="k">返回</span>刚才的位置</button>
+
+<aside class="spine" aria-label="报告信息与目录">
+  <div class="spine-inner">
+    <div class="spine-brand">
+      <span class="spine-kicker">Cyber Judge</span>
+      <span class="spine-word">赛博判官</span>
+    </div>
+    <div class="spine-rule" aria-hidden="true"></div>
+    <div class="spine-meta">{{SPINE_META}}</div>
+    <nav class="spine-nav" aria-label="本页目录">
+      {{NAV}}
+    </nav>
+    <div class="spine-foot">
+      <a class="spine-top" href="#top">↑ 页首</a>
+    </div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <a class="tb-mark" href="#top">赛博判官</a>
+  <span class="tb-meta">{{TOPBAR_META}}</span>
+  <a class="toc-btn" href="#toc-panel" aria-controls="toc-panel">目录</a>
+</header>
+
+<nav class="toc-panel" id="toc-panel" aria-label="本页目录">
+  <div class="toc-head"><span>目录</span><a class="toc-close" href="#top">关闭</a></div>
+  <div class="toc-list">
+    {{NAV}}
+  </div>
+</nav>
+
+<div class="page">
+  <div class="wrap">
+    <main id="main">
+    {{HERO}}
+
+    {{BODY}}
+    </main>
+    <footer class="foot">
+      <div><span class="mark">赛博判官</span> · {{KIND_LABEL}}报告</div>
+      <div>材料截至 {{AS_OF}} · 静态页面，可离线阅读</div>
+    </footer>
+  </div>
+</div>
+
+<script>
+{{JS}}
+</script>
+</body>
+</html>

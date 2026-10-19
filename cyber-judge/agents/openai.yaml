@@ -1,0 +1,4 @@
+interface:
+  display_name: "赛博判官"
+  short_description: "详尽调研社会热点，比较各方论点与证据，用庭审式 HTML 报告给出明确判断"
+  default_prompt: "请用 $cyber-judge 详尽调研这个热点，梳理各方争论点和证据，给出有依据的明确判断并生成 HTML 报告。"
