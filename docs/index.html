@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>赛博判官 · 把热点争议审理成一份报告</title>
+<meta name="description" content="赛博判官是一个分析热点争议的 Agent Skill：核查事实、拆解争点、逐条核对主张，输出可离线阅读的独立 HTML 报告。先给判断，再给出处。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="赛博判官 · 把热点争议审理成一份报告">
+<meta property="og:description" content="核查事实、拆解争点、逐条核对主张，输出可离线阅读的独立 HTML。先给判断，再给出处。">
+<meta property="og:image" content="assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="assets/social-preview.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%225%22%20y%3D%225%22%20width%3D%2254%22%20height%3D%2254%22%20fill%3D%22none%22%20stroke%3D%22%23a33124%22%20stroke-width%3D%225%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2244%22%20font-size%3D%2232%22%20text-anchor%3D%22middle%22%20fill%3D%22%23a33124%22%20font-family%3D%22serif%22%3E%E5%88%A4%3C%2Ftext%3E%3C%2Fsvg%3E">
+<style>
+:root{
+  --paper:#f4f0e6;--paper-2:#ece5d5;--paper-3:#faf7ef;
+  --ink:#1c1915;--ink-2:#3a342b;--muted:#6a6153;
+  --rule:#d9cfbc;--rule-2:#c3b7a0;--red:#a33124;
+  --spine:#16130f;--spine-2:#1e1a15;--cream:#efe8d9;--cream-muted:#9a9182;
+  --serif:"Songti SC","STSong","Source Han Serif SC","Noto Serif SC","SimSun",serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei","Microsoft YaHei UI","Hiragino Sans GB","Segoe UI",sans-serif;
+  --mono:"SF Mono","Cascadia Mono","JetBrains Mono","Consolas","DejaVu Sans Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.9;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,ul,ol,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--red);color:var(--paper)}
+:where(a,button):focus-visible{outline:2px solid var(--red);outline-offset:4px}
+.wrap{max-width:1220px;margin:0 auto;padding:0 48px}
+.mono{font-family:var(--mono)}
+.skip{position:fixed;top:8px;left:8px;z-index:100;padding:10px 16px;background:var(--ink);color:var(--paper);font-size:13px;transform:translateY(-160%)}
+.skip:focus{transform:none}
+
+/* ---------- 导航 ---------- */
+.nav{position:sticky;top:0;z-index:30;background:rgba(244,240,230,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.nav-in{display:flex;align-items:center;gap:28px;height:60px}
+.brand{display:flex;align-items:baseline;gap:12px;margin-right:auto}
+.brand b{font-size:14px;font-weight:600;letter-spacing:.26em}
+.brand span{font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--muted)}
+.nav a.lnk{font-size:13px;color:var(--ink-2);letter-spacing:.04em;padding:4px 0;border-bottom:1px solid transparent}
+.nav a.lnk:hover{border-color:var(--ink)}
+.nav a.gh{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;border:1px solid var(--ink-2);padding:6px 12px}
+.nav a.gh:hover{background:var(--ink);color:var(--paper)}
+@media (max-width:820px){.nav a.lnk{display:none}.nav-in{gap:16px}}
+
+/* ---------- 首屏 ---------- */
+.hero{padding:76px 0 0}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:64px;align-items:center}
+.eyebrow{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:.26em;color:var(--red)}
+.eyebrow::before{content:"";width:7px;height:7px;background:var(--red)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(38px,4.9vw,66px);line-height:1.2;letter-spacing:.01em;margin-top:20px}
+h1 em{font-style:normal;color:var(--red)}
+.hero-sub{margin-top:26px;max-width:540px;font-size:17.5px;line-height:1.9;color:var(--ink-2)}
+.hero-sub b{color:var(--ink);font-weight:600}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:26px;margin-top:36px}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);padding:13px 22px;font-size:14px;letter-spacing:.06em;border:1px solid var(--ink)}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn .a{font-family:var(--mono);font-size:11px}
+.link{font-size:14px;border-bottom:1px solid var(--rule-2);padding-bottom:3px;color:var(--ink-2)}
+.link:hover{color:var(--red);border-color:var(--red)}
+.hero-meta{margin-top:30px;font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;line-height:1.9;color:var(--muted)}
+.hero-meta b{color:var(--ink-2);font-weight:500}
+.hero-figure{position:relative}
+.hero-figure img{border:0;background:transparent}
+.hero-figure figcaption{margin-top:10px;display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--muted)}
+@media (max-width:980px){.hero-grid{grid-template-columns:1fr;gap:48px}.hero{padding-top:52px}}
+
+/* ---------- 数字条 ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);margin-top:66px}
+.stats div{padding:20px 22px 22px 0;border-right:1px solid var(--rule)}
+.stats div:last-child{border-right:0}
+.stats div:not(:first-child){padding-left:22px}
+.stats b{display:block;font-family:var(--mono);font-size:30px;font-weight:500;line-height:1.2;letter-spacing:-.02em}
+.stats span{display:block;margin-top:6px;font-size:12px;letter-spacing:.06em;color:var(--muted)}
+@media (max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stats div:nth-child(2){border-right:0}.stats div:nth-child(n+3){border-top:1px solid var(--rule)}}
+
+/* ---------- 章节 ---------- */
+.sec{padding:100px 0 0}
+.sec-head{max-width:820px}
+.sec-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.26em;color:var(--red)}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(28px,3.4vw,42px);line-height:1.36;letter-spacing:.012em;margin-top:14px}
+.lead{margin-top:22px;max-width:700px;font-size:17px;line-height:1.92;color:var(--ink-2)}
+.lead b{color:var(--ink);font-weight:600}
+
+/* ---------- 对比表 ---------- */
+.compare{margin-top:44px;border-top:1px solid var(--ink)}
+.compare table{width:100%;border-collapse:collapse;font-size:15px}
+.compare th{text-align:left;padding:12px 18px 12px 0;border-bottom:1px solid var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--muted);font-weight:500}
+.compare th:last-child{color:var(--red)}
+.compare td{padding:17px 18px 17px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.75}
+.compare td:first-child{width:16%;font-size:12.5px;font-weight:600;letter-spacing:.06em;color:var(--ink-2);white-space:nowrap}
+.compare td:nth-child(2){width:40%;color:var(--muted)}
+.compare td:last-child{color:var(--ink)}
+.compare td:last-child::before{content:"";display:inline-block;width:4px;height:4px;background:var(--red);margin:0 9px 3px 0}
+.tblwrap{overflow-x:auto}
+@media (max-width:700px){
+  .compare table,.compare thead,.compare tbody,.compare tr,.compare th,.compare td{display:block}
+  .compare thead{display:none}
+  .compare tr{border-bottom:1px solid var(--rule);padding:16px 0}
+  .compare td{border:0;padding:2px 0;width:auto}
+  .compare td:first-child,.compare td:nth-child(2),.compare td:last-child{width:auto}
+  .compare td:first-child{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--muted);white-space:normal;margin-bottom:4px}
+  .compare td:nth-child(2){color:var(--muted);font-size:14px}
+  .compare td:nth-child(2)::before{content:"常见做法 · ";font-family:var(--mono);font-size:9.5px;letter-spacing:.08em}
+  .compare td:last-child{margin-top:9px;padding-left:13px;border-left:2px solid var(--red);font-size:15px}
+  .compare td:last-child::before{content:"赛博判官";display:block;width:auto;height:auto;background:none;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--red);margin:0 0 5px}
+}
+
+/* ---------- 五步 ---------- */
+.steps{margin-top:46px;border-top:1px solid var(--ink);max-width:900px}
+.steps li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:22px;padding:24px 0 26px;border-bottom:1px solid var(--rule)}
+.steps .n{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--red);padding-top:5px}
+.steps h3{font-size:18px;font-weight:600;letter-spacing:.04em}
+.steps p{margin-top:7px;font-size:15px;line-height:1.8;color:var(--ink-2);max-width:680px}
+
+/* ---------- 支持度色带 ---------- */
+.band{margin-top:96px;background:var(--paper-2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:78px 0 82px}
+.scale{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 64px;margin-top:42px;border-top:1px solid var(--rule-2)}
+.scale li{display:grid;grid-template-columns:124px minmax(0,1fr);gap:16px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--rule-2)}
+.scale .m{display:flex;align-items:center;gap:9px}
+.scale .k{font-size:14px;font-weight:600;letter-spacing:.08em;white-space:nowrap}
+.scale .d{font-size:14px;line-height:1.75;color:var(--ink-2)}
+.bars{display:inline-flex;gap:3px}
+.bars i{width:7px;height:7px;border:1px solid var(--rule-2);display:block}
+.bars i.on{background:var(--ink);border-color:var(--ink)}
+.mark{width:10px;height:10px;border:1px solid var(--ink);display:block;transform:rotate(45deg)}
+.mark.cross{transform:none;border:0;background:linear-gradient(45deg,transparent 44%,var(--red) 44%,var(--red) 56%,transparent 56%),linear-gradient(-45deg,transparent 44%,var(--red) 44%,var(--red) 56%,transparent 56%)}
+.mark.open{transform:none;border-style:dashed}
+.band-note{margin-top:30px;font-size:14px;line-height:1.85;color:var(--muted);max-width:760px}
+.band-note b{color:var(--ink)}
+@media (max-width:820px){.scale{grid-template-columns:1fr}.scale li:last-child{border-bottom:0}}
+
+/* ---------- 实样 ---------- */
+.cases{margin-top:48px;display:flex;flex-direction:column;gap:64px}
+.case{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:52px;align-items:center}
+.case:nth-child(even) .case-fig{order:2}
+.case-fig img{border:1px solid var(--rule-2);background:var(--paper-3)}
+.case-fig figcaption{margin-top:10px;font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--muted)}
+.case-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--muted)}
+.case h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.4;margin-top:10px}
+.case .q{font-family:var(--serif);font-size:19px;line-height:1.6;color:var(--ink-2);margin-top:10px}
+.case .v{margin-top:20px;padding-left:16px;border-left:2px solid var(--red);font-size:15px;line-height:1.8}
+.case .v b{font-weight:600}
+.case .m{margin-top:18px;font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--muted)}
+.case .go{display:inline-block;margin-top:20px;font-size:13.5px;border-bottom:1px solid var(--rule-2);padding-bottom:3px}
+.case .go:hover{color:var(--red);border-color:var(--red)}
+@media (max-width:860px){.case{grid-template-columns:1fr;gap:26px}.case:nth-child(even) .case-fig{order:0}.case h3{font-size:25px}}
+
+/* ---------- 读起来 ---------- */
+.read{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:56px;align-items:start;margin-top:46px}
+.read-fig img{border:1px solid var(--rule-2)}
+.read-fig figcaption{margin-top:10px;font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--muted)}
+.feats{display:flex;flex-direction:column}
+.feats li{padding:18px 0;border-top:1px solid var(--rule)}
+.feats li:first-child{border-top:0;padding-top:0}
+.feats .n{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--red)}
+.feats h3{font-size:17px;font-weight:600;letter-spacing:.04em;margin-top:6px}
+.feats p{margin-top:5px;font-size:14px;line-height:1.8;color:var(--ink-2)}
+.phones{display:flex;gap:30px;margin-top:52px;align-items:stretch}
+.phones figure{width:236px;display:flex;flex-direction:column}
+.phones img{border:1px solid var(--rule-2)}
+.phones figcaption{margin-top:auto;padding-top:9px;font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--muted);line-height:1.7}
+@media (max-width:980px){.read{grid-template-columns:1fr}.phones{gap:18px}.phones figure{width:calc(50% - 9px)}}
+
+/* ---------- 规格 ---------- */
+.specs{margin-top:42px;border-top:1px solid var(--ink)}
+.specs table{width:100%;border-collapse:collapse;font-size:15px}
+.specs th{text-align:left;padding:12px 18px 12px 0;border-bottom:1px solid var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--muted);font-weight:500}
+.specs td{padding:15px 18px 15px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.75}
+.specs td:first-child{width:22%;font-size:12.5px;font-weight:600;letter-spacing:.06em;color:var(--ink-2);white-space:nowrap}
+.specs td:last-child{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em}
+.specs td:last-child em{font-family:var(--sans);font-style:normal;font-size:14px;color:var(--ink-2)}
+
+/* ---------- 开始 ---------- */
+.start{margin-top:100px;background:var(--spine);color:var(--cream);padding:80px 0 86px}
+.start .sec-eyebrow{color:#d4574a}
+.start h2{color:var(--cream)}
+.start .lead{color:#c9bfae}
+.start .lead b{color:var(--cream)}
+.start-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:60px;margin-top:44px;align-items:start}
+.start-steps li{display:grid;grid-template-columns:34px 1fr;gap:16px;padding:16px 0;border-top:1px solid rgba(239,232,217,.16)}
+.start-steps li:first-child{border-top:0;padding-top:0}
+.start-steps .n{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#d4574a;padding-top:4px}
+.start-steps h3{font-size:16px;font-weight:600;letter-spacing:.05em;color:var(--cream)}
+.start-steps p{margin-top:5px;font-size:14px;line-height:1.8;color:#b3a897}
+.code{background:var(--spine-2);border-left:3px solid #d4574a;padding:22px 24px;font-family:var(--mono);font-size:12px;line-height:2.05;color:#cabfae;overflow-x:auto}
+.code .c{color:#9a9182}
+.code .p{color:#d4574a}
+.code .o{color:var(--cream)}
+.start-note{margin-top:16px;font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:#9a9182}
+@media (max-width:900px){.start-grid{grid-template-columns:1fr;gap:34px}}
+
+/* ---------- 边界 ---------- */
+.bounds{margin-top:42px;border-top:1px solid var(--ink);max-width:900px}
+.bounds li{display:grid;grid-template-columns:24px 1fr;gap:14px;padding:17px 0;border-bottom:1px solid var(--rule);font-size:15px;line-height:1.8;color:var(--ink-2)}
+.bounds li::before{content:"";width:6px;height:6px;background:var(--red);margin-top:11px}
+
+/* ---------- 页脚 ---------- */
+.foot{margin-top:90px;border-top:1px solid var(--ink);padding:26px 0 60px;display:flex;justify-content:space-between;gap:24px;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;color:var(--muted)}
+.foot .l{display:flex;flex-direction:column;gap:6px}
+.foot b{color:var(--ink-2);font-weight:500}
+.foot a:hover{color:var(--red)}
+@media (max-width:700px){.foot{flex-direction:column;gap:14px}.specs td:first-child,.compare td:first-child{width:auto}}
+@media (max-width:600px){
+  .wrap{padding:0 20px}
+  .hero-meta{font-size:9px}
+  .sec{padding-top:72px}
+  .band{padding:56px 0 60px}
+  .start{padding:60px 0 64px}
+  .phones{flex-wrap:wrap}
+  .phones figure{width:100%;max-width:280px}
+  .stats b{font-size:24px}
+  .case .v{font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <div class="brand"><b>赛博判官</b><span>CYBER JUDGE</span></div>
+    <a class="lnk" href="#problem">问题</a>
+    <a class="lnk" href="#method">方法</a>
+    <a class="lnk" href="#cases">实样</a>
+    <a class="lnk" href="#specs">规格</a>
+    <a class="lnk" href="#start">开始</a>
+    <a class="gh" href="https://github.com/n0-5iGn4L" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">AGENT SKILL · 热点争议分析</div>
+          <h1>把热点争议，<br>审理成<em>一份报告</em>。</h1>
+          <p class="hero-sub">核查事实、拆解争点、逐条核对各方主张，输出可离线阅读的独立 HTML。先给判断，再给出处；判断可以因为新证据被推翻。</p>
+          <div class="cta">
+            <a class="btn" href="#cases">看两份实样 <span class="a">→</span></a>
+            <a class="link" href="#method">它怎么审理</a>
+          </div>
+          <p class="hero-meta"><b>v0.2</b> · 事件争议分支已验证 · 公共议题分支未验证<br>单文件 HTML · 无外部请求 · 可打印</p>
+        </div>
+        <figure class="hero-figure">
+          <img src="assets/card.png" alt="判词卡：事件名、核心判断、四项争点的一行裁定、截至日期与证据编号" width="684" height="526">
+          <figcaption><span>判词卡</span><span>截图即可分享，依据不裁掉</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="stats">
+        <div><b>2</b><span>份完整实样</span></div>
+        <div><b>6</b><span>类支持度标签</span></div>
+        <div><b>0</b><span>百分比与人物评分</span></div>
+        <div><b>1</b><span>个 HTML 文件</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="problem">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">01 / 问题</div>
+        <h2>热点不缺观点，缺的是可核对的观点。</h2>
+        <p class="lead">大多数“分析”会长成三种样子：复述新闻、罗列双方、最后落在“仍需观察”。读者读完，还是不知道哪句话更站得住。这里的做法是把一场争议拆成可审理的争点，<b>逐条评价具体主张</b>，给出支持度与理由，最后落到一个明确的当前判断。</p>
+      </div>
+      <div class="compare tblwrap">
+        <table>
+          <thead><tr><th>维度</th><th>常见做法</th><th>赛博判官</th></tr></thead>
+          <tbody>
+            <tr><td>结论</td><td>各有各的道理，等待后续。</td><td>当前最佳解释，并写明什么材料会改变判断。</td></tr>
+            <tr><td>评价单位</td><td>整个事件，或整个人。</td><td>一句具体主张：谁说、说了什么、支持到哪一步。</td></tr>
+            <tr><td>支持度</td><td>语气、立场、看起来像。</td><td>六类语义标签，每一类都带理由，不折算成百分比。</td></tr>
+            <tr><td>出处</td><td>文末一堆链接。</td><td>每段可点回证据条目，再从条目回到对应争点。</td></tr>
+            <tr><td>可修正</td><td>不说明什么会推翻它。</td><td>指明决定性材料；新证据出现就改判。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="method">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">02 / 方法</div>
+        <h2>一场审理，五步走完。</h2>
+        <p class="lead">流程写在技能入口里，报告结构由模板承载。换一个事件，换的是数据，不是版式。</p>
+      </div>
+      <ol class="steps">
+        <li><span class="n">01</span><div><h3>立案与分流</h3><p>确认对象、时间、触发材料与本次主问题。事件争议与公共议题走两条轻量分支；有实质歧义才作最小澄清。</p></div></li>
+        <li><span class="n">02</span><div><h3>证据台账</h3><p>记下谁说了什么、何时说的、读到的是正文还是元数据、缺口在哪里。不同转载不按独立证据累计。</p></div></li>
+        <li><span class="n">03</span><div><h3>争点审理</h3><p>每个争点四拍：问题、各方主张、证据与支持度、局部裁定。同一方可以在不同争点上得到不同评价。</p></div></li>
+        <li><span class="n">04</span><div><h3>收束</h3><p>哪些说法站得住、最佳解释是什么、哪几个问题真正未决。不用“各有道理”代替结论。</p></div></li>
+        <li><span class="n">05</span><div><h3>交付</h3><p>单文件 HTML：目录、页边批注、证据回链、判词卡、打印样式。双击可读，不请求任何外部资源。</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="support">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">03 / 方法的一个切面</div>
+        <h2>不给百分比，给能被反驳的理由。</h2>
+        <p class="lead">支持度只评价某一句话，不评价人，也不折算成总分。六个标签对应六种形状，读者不必靠颜色分辨。</p>
+      </div>
+      <ul class="scale">
+        <li><span class="m"><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="k">支持较强</span></span><span class="d">直接材料与主张相符，关键反证不足以推翻。</span></li>
+        <li><span class="m"><span class="bars"><i class="on"></i><i class="on"></i><i></i></span><span class="k">支持有限</span></span><span class="d">部分材料相符，关键连接仍依赖推断或来源单一。</span></li>
+        <li><span class="m"><span class="bars"><i class="on"></i><i></i><i></i></span><span class="k">支持不足</span></span><span class="d">提出了说法，但没有支撑它的关键证据。</span></li>
+        <li><span class="m"><span class="mark cross"></span><span class="k">有明确反证</span></span><span class="d">可核对材料与主张直接冲突。</span></li>
+        <li><span class="m"><span class="mark open"></span><span class="k">暂无法判断</span></span><span class="d">缺少决定性材料，现有解释难以区分。</span></li>
+        <li><span class="m"><span class="mark"></span><span class="k">规范判断</span></span><span class="d">评价原则类主张，不按事实支持度计。</span></li>
+      </ul>
+      <p class="band-note">没有“87% 可信”，没有阵营血条，没有人物总分。<b>一场争论也不一定只有两方</b>：三种以上立场、同为一方却在不同争点上评价不同，都是正常结果。</p>
+    </div>
+  </section>
+
+  <section class="sec" id="cases">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">04 / 实样</div>
+        <h2>两份完整实样，同一套模板。</h2>
+        <p class="lead">都能直接点开，全文离线可读；手机与打印版式已经实测。</p>
+      </div>
+      <div class="cases">
+        <article class="case">
+          <figure class="case-fig">
+            <img src="assets/case-v800.png" alt="尊界 V800 报告首屏：墨色书脊、案由、大字追问与核心判断" width="1000" height="629">
+            <figcaption>v800.html · 桌面 1440px</figcaption>
+          </figure>
+          <div>
+            <div class="case-k">事件争议 · 产品安全</div>
+            <h3>尊界 V800 踏板支架断裂</h3>
+            <p class="q">送检合格，为何仍没回答关键问题？</p>
+            <p class="v"><b>当前判断：</b>安全质疑有实质依据。送检结果有价值，但还没有建立与实车断裂测试的可比性；升级值得肯定，回应还不完整。</p>
+            <p class="m">4 项争点 · 5 件证据 · 材料截至 2026-10-19</p>
+            <a class="go" href="examples/v800.html">打开完整报告 →</a>
+          </div>
+        </article>
+        <article class="case">
+          <figure class="case-fig">
+            <img src="assets/case-ayu.png" alt="神奇阿宇报告首屏：大字追问、核心判断与四项争点索引" width="1000" height="629">
+            <figcaption>ayu.html · 桌面 1440px</figcaption>
+          </figure>
+          <div>
+            <div class="case-k">事件争议 · 视频真实性</div>
+            <h3>神奇阿宇飞行滑板</h3>
+            <p class="q">质疑该打在哪个点上？</p>
+            <p class="v"><b>当前判断：</b>现有材料更支持真实载人飞行。“全是假的”证据弱；操控架构、AI 训练收益与户外风险控制更值得追问。</p>
+            <p class="m">4 项争点 · 4 件证据 · 材料截至 2026-10-19</p>
+            <a class="go" href="examples/ayu.html">打开完整报告 →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="reading">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">05 / 阅读</div>
+        <h2>长文，但不用硬读。</h2>
+        <p class="lead">首屏先给判断，正文按争点跳读，证据从任何一句判断一步可达。默认展示背景与核心论证，方法说明放附录。</p>
+      </div>
+      <div class="read">
+        <figure class="read-fig">
+          <img src="assets/issue.png" alt="争点页：主张在正文，支持度与理由在右页边，下方是理由块与判官短评" width="1100" height="798">
+          <figcaption>桌面争点页 · 正文 680px + 页边批注 232px</figcaption>
+        </figure>
+        <ol class="feats">
+          <li><span class="n">01</span><h3>30 秒首屏</h3><p>案由、追问、核心判断、截至日期。免责话不占第一屏，限定只跟着它影响的结论。</p></li>
+          <li><span class="n">02</span><h3>页边批注</h3><p>支持度与理由和主张同一行对齐；手机落到主张下方，带一条竖线，不丢层级。</p></li>
+          <li><span class="n">03</span><h3>证据回链</h3><p>正文的 V1 → 证据条目 → “被引用于 §争点 01”。从判断到出处，再回到读到的位置。</p></li>
+          <li><span class="n">04</span><h3>判词卡</h3><p>事件名、四项裁定、截至日期、证据编号。截图可分享，被裁掉的只有完整推理。</p></li>
+        </ol>
+      </div>
+      <div class="phones">
+        <figure><img src="assets/mobile-hero.png" alt="手机首屏：两行标题、核心判断与 2×2 争点索引" width="375" height="812"><figcaption>375px 首屏<br>标题两行，无横向滚动</figcaption></figure>
+        <figure><img src="assets/mobile-issue.png" alt="手机争点页：批注落到主张下方" width="375" height="812"><figcaption>375px 争点页<br>批注落到主张下方</figcaption></figure>
+        <figure><img src="assets/print.png" alt="A4 打印模拟：单栏、时间线与证据标签" width="640" height="949"><figcaption>A4 打印<br>书脊隐藏，折叠区展开</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="specs">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">06 / 规格</div>
+        <h2>静态文件，实测过再交付。</h2>
+      </div>
+      <div class="specs tblwrap">
+        <table>
+          <thead><tr><th>项目</th><th>实测</th></tr></thead>
+          <tbody>
+            <tr><td>输出</td><td><em>单个 HTML，CSS 与脚本内联，双击可读</em></td></tr>
+            <tr><td>依赖</td><td><em>无框架、无外部请求；字体用系统栈</em></td></tr>
+            <tr><td>脚本关闭</td><td><em>正文、目录、证据锚点、折叠区全部可用</em></td></tr>
+            <tr><td>打印</td><td><em>A4 单栏，折叠区展开；v800 为 9 页</em></td></tr>
+            <tr><td>对比度</td><td>15.39 : 1 · 10.82 : 1 · 5.35 : 1 · 6.11 : 1</td></tr>
+            <tr><td>版式</td><td><em>1920–320 十个宽度，0 横向溢出</em></td></tr>
+            <tr><td>引用</td><td><em>37 + 39 处，0 断链</em></td></tr>
+            <tr><td>复用</td><td><em>数据 JSON 驱动，一条命令重建</em></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="start" id="start">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">07 / 开始</div>
+        <h2>三步，从事件到报告。</h2>
+        <p class="lead">技能入口是 SKILL.md，写作与分支规范在 references/，渲染入口是 template/build.mjs。Node 18 以上，零第三方依赖。</p>
+      </div>
+      <div class="start-grid">
+        <ol class="start-steps">
+          <li><span class="n">01</span><div><h3>放进 skills 目录</h3><p>把 skill 目录放到你的 Agent 技能路径，SKILL.md 是入口。</p></div></li>
+          <li><span class="n">02</span><div><h3>写这一期的数据</h3><p>复制一个报告对象，替换标题、争点、主张与来源编号。</p></div></li>
+          <li><span class="n">03</span><div><h3>渲染并校验</h3><p>一条命令输出 HTML；校验会拦下不存在的来源编号、非法链接与空字段。</p></div></li>
+        </ol>
+        <div>
+          <pre class="code"><span class="c"># 渲染全部报告</span>
+<span class="p">$</span> node template/build.mjs
+
+<span class="c"># 只做校验，不写文件</span>
+<span class="p">$</span> node template/build.mjs --check
+<span class="o">校验通过：2 份报告，0 条提示。</span>
+
+<span class="c"># 只渲染一份</span>
+<span class="p">$</span> node template/build.mjs v800</pre>
+          <p class="start-note">构建时内联 CSS 与脚本；成品不请求字体、框架或数据。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="bounds">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">08 / 边界</div>
+        <h2>说清楚什么还没验证。</h2>
+      </div>
+      <ul class="bounds">
+        <li>两案都是事件争议分支；公共议题分支还没有样例验证，不为展示分类硬改案例。</li>
+        <li>材料截至 2026-10-19；结论会随新证据改判，这是设计的一部分，不是补丁。</li>
+        <li>它是分析工具，不是司法裁判，也不替代专业鉴定或法律意见。</li>
+        <li>报告与模板都是静态文件：没有后台、没有账号、不上传数据。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:24px;width:100%;flex-wrap:wrap">
+    <div class="l">
+      <b>赛博判官 · Cyber Judge</b>
+      <span>热点争议分析 Skill · v0.2 · 2026-10-19</span>
+    </div>
+    <div class="l" style="text-align:right">
+      <span>代码 MIT · 报告文本与来源摘录权利归原方</span>
+      <span><a href="examples/v800.html">实样一</a> · <a href="examples/ayu.html">实样二</a> · <a href="https://github.com/n0-5iGn4L" target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
+
+
+

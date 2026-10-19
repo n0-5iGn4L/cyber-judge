@@ -1,0 +1,1446 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>神奇阿宇飞行滑板：质疑该打在哪个点上？ · 赛博判官</title>
+<meta name="description" content="神奇阿宇发布自制载人飞行滑板视频后，争论从画面真假扩展到 AI、飞控和安全。现有材料更支持装置确实载人飞过；技术质疑里，操控架构和宣传幅度的问题更有价值，把训练 AI 当成飞控来驳斥则打偏了。">
+<meta name="generator" content="cyber-judge-template/1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%225%22%20y%3D%225%22%20width%3D%2254%22%20height%3D%2254%22%20fill%3D%22none%22%20stroke%3D%22%23a33124%22%20stroke-width%3D%225%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2244%22%20font-size%3D%2232%22%20text-anchor%3D%22middle%22%20fill%3D%22%23a33124%22%20font-family%3D%22serif%22%3E%E5%88%A4%3C%2Ftext%3E%3C%2Fsvg%3E">
+<style>
+/* ==========================================================================
+   赛博判官 · 事件争议报告模板
+   设计母题：卷宗书脊 + 判词批注
+   - 墨色书脊：固定左栏，承载刊名、争点目录与阅读进度
+   - 纸面正文：暖纸底、宋体判词、黑体记录
+   - 朱批：只用于裁定、争点编号、引用标签与印章
+   - 页边批注：支持度刻度与理由，正文右侧对齐
+   ========================================================================== */
+
+/* ---------- tokens ---------- */
+:root {
+  --paper: #f4f0e6;
+  --paper-2: #ece5d5;
+  --paper-3: #faf7ef;
+  --ink: #1c1915;
+  --ink-2: #3a342b;
+  --muted: #6a6153;
+  --rule: #d9cfbc;
+  --rule-2: #c3b7a0;
+  --red: #a33124;
+  --spine: #16130f;
+  --spine-fg: #efe8d9;
+  --spine-muted: #9a9182;
+
+  --serif: "Songti SC", "STSong", "Source Han Serif SC", "Noto Serif SC", "SimSun", "Noto Serif CJK SC", serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Microsoft YaHei UI", "Hiragino Sans GB", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  --mono: "SF Mono", "Cascadia Mono", "JetBrains Mono", "Consolas", "DejaVu Sans Mono", monospace;
+
+  --spine-w: 200px;
+  --main-w: 680px;
+  --note-w: 232px;
+  --gap: 56px;
+  --pad: 56px;
+
+  --fs-body: 17px;
+  --lh-body: 1.95;
+}
+
+/* ---------- reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+i, em { font-style: normal; }
+button { font: inherit; color: inherit; }
+
+::selection { background: var(--red); color: var(--paper); }
+
+:where(a, summary, button):focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* ---------- utility ---------- */
+.mono { font-family: var(--mono); }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: fixed; top: 8px; left: 8px; z-index: 100;
+  padding: 10px 16px; background: var(--ink); color: var(--paper);
+  font-size: 13px; transform: translateY(-160%);
+}
+.skip:focus {
+  transform: none; background: var(--red); color: var(--paper);
+  outline-color: var(--paper);
+}
+.spine :where(a, summary, button):focus-visible,
+.topbar :where(a, summary, button):focus-visible { outline-color: #f2e4ca; }
+
+/* ==========================================================================
+   书脊
+   ========================================================================== */
+.spine {
+  position: fixed; inset: 0 auto 0 0; z-index: 40;
+  width: var(--spine-w);
+  background: var(--spine);
+  color: var(--spine-fg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.spine::after {
+  content: ""; position: absolute; top: 0; right: 0;
+  width: 2px; height: var(--progress, 0%);
+  background: var(--red);
+  transition: height .12s linear;
+}
+.spine-inner {
+  min-height: 100%;
+  display: flex; flex-direction: column;
+  padding: 30px 26px 26px;
+}
+.spine-brand { display: flex; flex-direction: column; gap: 14px; }
+.spine-kicker {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .34em;
+  color: var(--spine-muted); text-transform: uppercase;
+}
+.spine-word {
+  writing-mode: vertical-rl;
+  font-family: var(--serif); font-size: 34px; line-height: 1.06;
+  letter-spacing: .16em; color: var(--spine-fg);
+  margin-top: 4px;
+}
+.spine-rule { height: 1px; background: rgba(239,232,217,.18); margin: 26px 0 18px; }
+.spine-meta {
+  font-family: var(--mono); font-size: 10px; line-height: 1.9;
+  letter-spacing: .04em; color: var(--spine-muted);
+}
+.spine-meta b { color: var(--spine-fg); font-weight: 500; }
+.spine-nav { margin-top: 4px; display: flex; flex-direction: column; }
+.spine-nav a {
+  display: grid; grid-template-columns: 22px 1fr; gap: 8px;
+  padding: 7px 0; border-top: 1px solid rgba(239,232,217,.10);
+  color: var(--spine-muted);
+  font-size: 12px; line-height: 1.45; letter-spacing: .02em;
+  transition: color .15s;
+}
+.spine-nav a:first-child { border-top: 0; }
+.spine-nav a:hover { color: var(--spine-fg); }
+.spine-nav .n {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .04em;
+  padding-top: 2px; color: rgba(239,232,217,.42);
+}
+.spine-nav a[aria-current] { color: var(--spine-fg); }
+.spine-nav a[aria-current] .n { color: #d4574a; }
+.spine-nav a[aria-current] .t { position: relative; }
+.spine-nav a[aria-current] .t::before {
+  content: ""; position: absolute; left: -8px; top: .55em;
+  width: 3px; height: 3px; background: #d4574a;
+}
+.spine-foot { margin-top: auto; padding-top: 30px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.spine-top {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em;
+  color: var(--spine-muted); border-bottom: 1px solid rgba(239,232,217,.22); padding-bottom: 2px;
+}
+.spine-top:hover { color: var(--spine-fg); border-color: var(--spine-fg); }
+
+/* 印章 */
+.seal {
+  --seal: 74px;
+  width: var(--seal); height: var(--seal);
+  border: 2px solid var(--red);
+  color: var(--red);
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  place-items: center;
+  font-family: var(--serif); font-size: calc(var(--seal) * .27); line-height: 1;
+  letter-spacing: 0;
+  transform: rotate(-5deg);
+  opacity: .9;
+  mix-blend-mode: multiply;
+  user-select: none;
+}
+.seal.spine-seal {
+  --seal: 42px;
+  border-width: 1px;
+  color: #c4574a; border-color: #c4574a;
+  font-size: 12px; opacity: .85; transform: rotate(-6deg);
+}
+
+/* ==========================================================================
+   页框
+   ========================================================================== */
+.page { margin-left: var(--spine-w); }
+.wrap {
+  max-width: calc(var(--main-w) + var(--gap) + var(--note-w) + var(--pad) * 2);
+  margin: 0 auto;
+  padding-left: var(--pad); padding-right: var(--pad);
+}
+.prose { max-width: var(--main-w); }
+
+/* ---------- 顶栏 ---------- */
+.toprail {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+  padding: 26px 0 14px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em;
+  color: var(--muted);
+}
+.toprail .right { color: var(--ink-2); white-space: nowrap; }
+.toprail .dot { color: var(--red); padding: 0 .5em; }
+
+/* ==========================================================================
+   首屏
+   ========================================================================== */
+.hero { padding-bottom: 8px; }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, var(--main-w)) var(--note-w);
+  column-gap: var(--gap);
+  padding-top: 64px;
+  align-items: start;
+}
+.case-head { min-width: 0; }
+.case-subject {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; font-weight: 600; letter-spacing: .16em; line-height: 1.7;
+  color: var(--ink-2);
+}
+.case-subject::before {
+  content: ""; flex: none; width: 22px; height: 2px; background: var(--red);
+}
+.case-title {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(36px, 4.15vw, 58px);
+  line-height: 1.16; letter-spacing: .008em;
+  margin-top: 18px;
+  text-wrap: balance;
+}
+.case-title .q-line { display: block; }
+.case-title .q-line + .q-line { margin-top: .04em; }
+.hero-verdict {
+  margin-top: 40px;
+  border-left: 3px solid var(--red);
+  padding-left: 22px;
+  max-width: 620px;
+}
+.hero-verdict .label {
+  display: block;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em;
+  color: var(--red); margin-bottom: 9px;
+}
+.hero-verdict p {
+  font-family: var(--serif); font-size: 24px; line-height: 1.62;
+  letter-spacing: .01em;
+}
+.hero-summary {
+  margin-top: 30px; max-width: 610px;
+  font-size: 16.5px; line-height: 1.92; color: var(--ink-2);
+}
+.hero-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 22px; padding-top: 6px; }
+.hero-stamp { align-self: flex-end; }
+.hero-aside .aside-note {
+  font-family: var(--mono); font-size: 9.5px; line-height: 1.9;
+  letter-spacing: .05em; color: var(--muted); text-align: right;
+}
+
+/* ---------- 争点索引 ---------- */
+.issue-index {
+  margin-top: 58px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.issue-index a {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 18px 18px 20px 0;
+  border-right: 1px solid var(--rule);
+  min-width: 0;
+  transition: background .15s;
+}
+.issue-index a:last-child { border-right: 0; }
+.issue-index a:not(:first-child) { padding-left: 18px; }
+.issue-index a:hover { background: rgba(28,25,21,.035); }
+.issue-index .n {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--red);
+}
+.issue-index .t {
+  font-size: 14px; font-weight: 500; line-height: 1.5; letter-spacing: .01em;
+  color: var(--ink);
+}
+.issue-index a:hover .t { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+/* ==========================================================================
+   章节骨架
+   ========================================================================== */
+.sec { padding-top: 96px; }
+.eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em;
+  color: var(--red); margin-bottom: 12px;
+}
+.eyebrow::before { content: ""; width: 7px; height: 7px; background: var(--red); flex: none; }
+.sec-title {
+  font-size: 27px; font-weight: 600; line-height: 1.4; letter-spacing: .01em;
+  margin-bottom: 26px;
+}
+.sub-label {
+  display: flex; align-items: center; gap: 16px;
+  font-size: 12px; font-weight: 600; letter-spacing: .18em; color: var(--ink-2);
+  margin: 46px 0 18px;
+}
+.sub-label::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+/* ---------- 正文 ---------- */
+.body-text {
+  font-size: var(--fs-body); line-height: var(--lh-body);
+  color: var(--ink);
+  max-width: var(--main-w);
+}
+.body-text + .body-text { margin-top: 1.05em; }
+
+/* ---------- 时间线 ---------- */
+.timeline { max-width: var(--main-w); border-top: 1px solid var(--rule); }
+.timeline li {
+  display: grid; grid-template-columns: 148px minmax(0, 1fr);
+  gap: 24px;
+  padding: 20px 0 22px;
+  border-bottom: 1px solid var(--rule);
+}
+.t-date {
+  font-family: var(--mono); font-size: 12px; line-height: 1.7;
+  letter-spacing: .02em; color: var(--ink-2);
+  padding-top: 2px;
+  overflow-wrap: anywhere;
+}
+.t-date::before {
+  content: ""; display: inline-block; width: 6px; height: 6px;
+  background: var(--red); margin-right: 9px; vertical-align: 1px;
+}
+.t-title { font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+.t-text { font-size: 15px; line-height: 1.85; color: var(--ink-2); margin-top: 6px; }
+.t-text .cite { margin-left: 3px; }
+
+/* ---------- 各方角色 ---------- */
+.actors {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--rule);
+}
+.actors li {
+  padding: 18px 22px 6px 0;
+  border-right: 1px solid var(--rule);
+  min-width: 0;
+}
+.actors li:last-child { border-right: 0; }
+.actors li:not(:first-child) { padding-left: 22px; }
+.actor-name {
+  display: block;
+  font-family: var(--serif); font-size: 18px; line-height: 1.5; letter-spacing: .02em;
+}
+.actor-role {
+  display: block; margin-top: 8px;
+  font-size: 13px; line-height: 1.75; color: var(--muted);
+}
+
+/* ==========================================================================
+   争点
+   ========================================================================== */
+.issue { padding-top: 104px; scroll-margin-top: 24px; }
+.issue:first-of-type { padding-top: 88px; }
+.issue-bar { display: flex; align-items: center; gap: 12px; }
+.issue-kicker {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: var(--red);
+}
+.issue-num {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .04em;
+  color: var(--paper); background: var(--red);
+  padding: 3px 8px 2px; line-height: 1.2;
+}
+.issue-bar .line { flex: 1; height: 1px; background: var(--rule-2); }
+.issue-q {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(26px, 2.7vw, 34px); line-height: 1.46; letter-spacing: .012em;
+  margin-top: 20px; max-width: 780px;
+}
+.verdict {
+  margin-top: 30px; border-left: 3px solid var(--red); padding-left: 22px;
+  max-width: 660px;
+}
+.verdict .label {
+  display: block;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: var(--red);
+  margin-bottom: 8px;
+}
+.verdict p {
+  font-family: var(--serif); font-size: 21px; line-height: 1.72; letter-spacing: .012em;
+}
+
+/* ---------- 论点：正文 + 页边批注 ---------- */
+.duo {
+  display: grid;
+  grid-template-columns: minmax(0, var(--main-w)) var(--note-w);
+  column-gap: var(--gap);
+  align-items: start;
+}
+.claims { margin-top: 34px; }
+.claim { padding-top: 26px; }
+.claim + .claim { border-top: 1px solid var(--rule); margin-top: 26px; }
+.speaker {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: .1em; color: var(--ink-2);
+  margin-bottom: 9px;
+}
+.speaker::before { content: ""; width: 6px; height: 6px; background: var(--ink); flex: none; }
+.claim-text {
+  font-size: 18.5px; line-height: 1.85; letter-spacing: .012em; color: var(--ink);
+  max-width: 34em;
+}
+.claim-note { padding-top: 26px; }
+.support { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.bars { display: inline-flex; gap: 3px; }
+.bars i {
+  width: 7px; height: 7px; border: 1px solid var(--rule-2); background: transparent;
+  display: block;
+}
+.bars i.on { background: var(--ink); border-color: var(--ink); }
+.support-mark {
+  width: 9px; height: 9px; display: block; flex: none;
+  border: 1px solid var(--ink); transform: rotate(45deg);
+}
+.support-mark.cross {
+  transform: none; border: 0;
+  background:
+    linear-gradient(45deg, transparent 44%, var(--red) 44%, var(--red) 56%, transparent 56%),
+    linear-gradient(-45deg, transparent 44%, var(--red) 44%, var(--red) 56%, transparent 56%);
+}
+.support-mark.open { border-style: dashed; transform: none; }
+.support-label {
+  font-size: 12px; font-weight: 600; letter-spacing: .12em; color: var(--ink);
+}
+.support-reason {
+  margin-top: 9px;
+  font-size: 13px; line-height: 1.8; color: var(--muted);
+}
+
+/* ---------- 理由 ---------- */
+.reasoning { margin-top: 42px; max-width: var(--main-w); }
+.reasoning .sub-label { margin-top: 0; }
+.reasoning-body {
+  border-left: 2px solid var(--ink);
+  padding-left: 26px;
+}
+.reasoning-body p { font-size: var(--fs-body); line-height: var(--lh-body); }
+.reasoning-body p + p { margin-top: 1em; }
+
+/* ---------- 判官短评 ---------- */
+.roast {
+  margin-top: 44px; max-width: calc(var(--main-w) + var(--note-w) + var(--gap));
+  background: var(--paper-2);
+  border-top: 1px solid var(--rule-2);
+  border-bottom: 1px solid var(--rule-2);
+  padding: 24px 30px 26px;
+  position: relative;
+}
+.roast::before {
+  content: ""; position: absolute; left: 0; top: -1px; bottom: -1px; width: 3px; background: var(--red);
+}
+.roast .label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: var(--red);
+}
+.roast .label::after { content: ""; width: 5px; height: 5px; background: var(--red); border-radius: 50%; }
+.roast p {
+  margin-top: 10px;
+  font-family: var(--serif); font-size: 22px; line-height: 1.72; letter-spacing: .014em;
+}
+
+/* ==========================================================================
+   结论
+   ========================================================================== */
+.conclusion-body { max-width: var(--main-w); }
+.conclusion-body p {
+  font-family: var(--serif); font-size: 20px; line-height: 1.86; letter-spacing: .012em;
+}
+.conclusion-body p + p { margin-top: 1.1em; }
+.questions { margin-top: 54px; max-width: var(--main-w); }
+.questions li {
+  display: grid; grid-template-columns: 34px 1fr; gap: 16px;
+  padding: 16px 0; border-top: 1px solid var(--rule);
+  font-size: 16px; line-height: 1.8;
+}
+.questions li:last-child { border-bottom: 1px solid var(--rule); }
+.questions .qn {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--red); padding-top: 4px;
+}
+
+/* ==========================================================================
+   判词卡
+   ========================================================================== */
+.share { margin-top: 76px; max-width: var(--main-w); }
+.share-cap {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em; color: var(--muted);
+  margin-bottom: 12px;
+}
+.share-card {
+  background: var(--paper-3);
+  border: 1px solid var(--ink-2);
+  padding: 30px 34px 26px;
+  position: relative;
+}
+.card-top {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em; color: var(--red);
+  padding-bottom: 16px; border-bottom: 1px solid var(--rule);
+}
+.card-top .date { color: var(--muted); letter-spacing: .08em; }
+.card-case {
+  font-size: 12px; font-weight: 600; letter-spacing: .16em; color: var(--ink-2);
+  margin-top: 20px;
+}
+.card-headline {
+  font-family: var(--serif); font-weight: 400;
+  font-size: 27px; line-height: 1.5; letter-spacing: .014em;
+  margin-top: 10px; padding-right: 26px;
+}
+.card-rows { margin-top: 22px; border-top: 1px solid var(--rule); }
+.card-rows li {
+  display: grid; grid-template-columns: 26px 104px minmax(0, 1fr); gap: 12px;
+  padding: 11px 0; border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.card-rows .n { font-family: var(--mono); font-size: 10px; color: var(--red); }
+.card-rows .k { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--ink-2); }
+.card-rows .v { font-size: 13.5px; line-height: 1.7; color: var(--ink); }
+.card-foot {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 18px;
+  margin-top: 22px;
+}
+.card-foot .meta { font-family: var(--mono); font-size: 9.5px; line-height: 1.9; letter-spacing: .06em; color: var(--muted); }
+.card-foot .meta b { color: var(--ink-2); font-weight: 500; }
+.card-seal { --seal: 52px; flex: none; }
+
+/* ==========================================================================
+   证据
+   ========================================================================== */
+.legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 42px; margin: 8px 0 34px; }
+.legend div { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: baseline; }
+.legend dt, .legend .k { font-size: 12px; font-weight: 600; letter-spacing: .1em; }
+.legend .d { font-size: 13px; line-height: 1.7; color: var(--muted); }
+
+.sources { max-width: calc(var(--main-w) + var(--note-w) + var(--gap)); border-top: 1px solid var(--ink); }
+.source {
+  display: grid; grid-template-columns: 74px minmax(0, 1fr);
+  gap: 22px;
+  padding: 26px 0 28px;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 28px;
+}
+.source:target { animation: flash 1.6s ease-out 1; }
+@keyframes flash {
+  0% { background: rgba(163,49,36,.10); }
+  100% { background: transparent; }
+}
+.src-id {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--red);
+  padding-top: 4px;
+}
+.src-title { font-size: 16px; font-weight: 600; line-height: 1.6; letter-spacing: .01em; }
+.src-meta {
+  margin-top: 6px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em; color: var(--muted);
+}
+.src-note { margin-top: 10px; font-size: 13.5px; line-height: 1.8; color: var(--ink-2); }
+.src-url {
+  display: inline-block; margin-top: 10px;
+  font-family: var(--mono); font-size: 11px; line-height: 1.7; letter-spacing: .01em;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-2);
+  overflow-wrap: anywhere; word-break: break-all;
+}
+.src-url:hover { color: var(--red); border-color: var(--red); }
+.src-url .ext { color: var(--red); }
+.src-refs {
+  margin-top: 12px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .04em; color: var(--muted);
+}
+.src-refs .k { color: var(--ink-2); }
+.src-refs a { color: var(--ink-2); border-bottom: 1px solid var(--rule-2); padding-bottom: 1px; }
+.src-refs a::before { content: "§"; color: var(--red); margin-right: 3px; font-size: 9.5px; }
+.src-refs a:hover { color: var(--red); border-color: var(--red); }
+
+.method { margin-top: 40px; max-width: calc(var(--main-w) + var(--note-w) + var(--gap)); border-top: 1px solid var(--rule); }
+.method summary {
+  cursor: pointer; list-style: none; padding: 16px 0;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; color: var(--ink-2);
+  display: flex; align-items: center; gap: 10px;
+}
+.method summary::-webkit-details-marker { display: none; }
+.method summary::before {
+  content: ""; width: 0; height: 0; flex: none;
+  border-left: 5px solid var(--red); border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+  transition: transform .15s;
+}
+.method[open] summary::before { transform: rotate(90deg); }
+.method summary:hover { color: var(--red); }
+.method-body { padding: 4px 0 20px; font-size: 14px; line-height: 1.9; color: var(--ink-2); max-width: 760px; }
+
+/* ==========================================================================
+   页脚
+   ========================================================================== */
+.foot {
+  margin-top: 80px; padding: 22px 0 56px;
+  border-top: 1px solid var(--ink);
+  display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; color: var(--muted);
+}
+.foot .mark { font-family: var(--sans); font-weight: 600; letter-spacing: .24em; color: var(--ink-2); font-size: 11px; }
+
+/* ---------- 引用标签 ---------- */
+.cite {
+  display: inline-block;
+  font-family: var(--mono); font-size: .55em; line-height: 1.5;
+  letter-spacing: .04em;
+  color: var(--red);
+  border: 1px solid rgba(163,49,36,.38);
+  padding: 0 4px;
+  margin-left: 4px;
+  vertical-align: .18em;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.cite:hover, .cite:focus-visible { background: var(--red); color: var(--paper); border-color: var(--red); }
+
+/* ---------- 返回原处 ---------- */
+.back-pill {
+  position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 12px);
+  z-index: 50; display: none; align-items: center; gap: 10px;
+  padding: 11px 20px;
+  background: var(--ink); color: var(--paper);
+  font-size: 12.5px; letter-spacing: .04em;
+  border: 0; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(28,25,21,.22);
+  opacity: 0; transition: opacity .18s, transform .18s;
+}
+.back-pill[data-show] { display: flex; opacity: 1; transform: translate(-50%, 0); }
+.back-pill .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em; color: #d4574a; }
+
+/* ==========================================================================
+   移动端
+   ========================================================================== */
+.topbar { display: none; }
+.toc-panel { display: none; }
+
+@media (max-width: 1220px) {
+  :root { --spine-w: 172px; --main-w: 640px; --note-w: 210px; --gap: 40px; --pad: 40px; }
+  .spine-inner { padding: 26px 20px 22px; }
+  .spine-word { font-size: 30px; }
+  .actors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .actors li:nth-child(2) { border-right: 0; }
+  .actors li:nth-child(n+3) { border-top: 1px solid var(--rule); padding-top: 18px; }
+}
+
+@media (max-width: 1020px) {
+  :root { --spine-w: 0px; --pad: 40px; }
+  .spine { display: none; }
+  .page { margin-left: 0; }
+  .topbar {
+    display: flex; align-items: center; gap: 14px;
+    position: sticky; top: 0; z-index: 45;
+    background: var(--spine); color: var(--spine-fg);
+    padding: 12px var(--pad);
+    font-size: 13px;
+  }
+  .topbar::after {
+    content: ""; position: absolute; left: 0; right: auto; bottom: 0;
+    width: var(--progress, 0%); height: 2px; background: var(--red);
+  }
+  .tb-mark { font-weight: 600; letter-spacing: .22em; font-size: 13px; }
+  .toprail { display: none; }
+  .tb-meta { font-family: var(--mono); font-size: 9.5px; letter-spacing: .04em; color: var(--spine-muted); white-space: nowrap; }
+  .toc-btn {
+    margin-left: auto;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+    border: 1px solid rgba(239,232,217,.3); padding: 5px 10px;
+    color: var(--spine-fg);
+  }
+  .toc-btn:hover { border-color: var(--spine-fg); }
+  .toc-panel { display: none; }
+  .toc-panel:target, .toc-panel.open {
+    display: block;
+    position: fixed; inset: 56px 0 0 0; z-index: 60;
+    background: var(--paper); color: var(--ink);
+    overflow-y: auto; overscroll-behavior: contain;
+    border-top: 1px solid var(--rule);
+  }
+  .toc-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 14px var(--pad) 12px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .2em; color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+  }
+  .toc-close { color: var(--ink-2); border-bottom: 1px solid var(--rule-2); padding-bottom: 1px; }
+  .toc-list a {
+    display: grid; grid-template-columns: 26px 1fr; gap: 10px;
+    padding: 14px var(--pad); font-size: 14px; border-bottom: 1px solid var(--rule);
+  }
+  .toc-list .n { font-family: var(--mono); font-size: 9.5px; color: var(--red); padding-top: 4px; }
+  .duo { display: block; }
+  .claim-note { padding-top: 12px; }
+  .claim-text { font-size: 18px; }
+  [data-nav], .source { scroll-margin-top: 74px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero-aside { display: none; }
+  .case-title { font-size: clamp(34px, 6vw, 52px); }
+  .issue-q { font-size: clamp(25px, 4.2vw, 32px); }
+}
+
+@media (max-width: 760px) {
+  :root { --pad: 22px; --fs-body: 16.5px; }
+  .hero-grid { padding-top: 38px; }
+  .case-subject { font-size: 11.5px; letter-spacing: .1em; }
+  .case-title { font-size: clamp(27px, 7.4vw, 40px); line-height: 1.22; margin-top: 14px; letter-spacing: .01em; }
+  .hero-verdict { margin-top: 28px; padding-left: 16px; }
+  .hero-verdict p { font-size: 20px; }
+  .hero-summary { margin-top: 22px; font-size: 15.5px; line-height: 1.9; }
+  .issue-index { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 38px; }
+  .issue-index a { padding: 14px 14px 16px 0; border-bottom: 1px solid var(--rule); }
+  .issue-index a:nth-child(2n) { border-right: 0; }
+  .issue-index a:nth-child(n+3) { border-bottom: 0; }
+  .issue-index a:nth-child(2) { padding-left: 16px; }
+  .issue-index a:nth-child(4) { padding-left: 16px; }
+  .issue-index .t { font-size: 13.5px; }
+  .sec { padding-top: 64px; }
+  .sec-title { font-size: 22px; margin-bottom: 20px; }
+  .sub-label { margin-top: 34px; font-size: 11px; letter-spacing: .14em; }
+  .timeline li { grid-template-columns: 1fr; gap: 6px; padding: 16px 0 18px; }
+  .t-date { padding-top: 0; }
+  .actors { grid-template-columns: 1fr; }
+  .actors li { border-right: 0; padding: 14px 0 2px; }
+  .actors li:not(:first-child) { padding-left: 0; }
+  .actors li:nth-child(n+2) { border-top: 1px solid var(--rule); padding-top: 14px; }
+  .actor-role { margin-top: 4px; }
+  .issue { padding-top: 68px; }
+  .issue:first-of-type { padding-top: 60px; }
+  .issue-q { font-size: clamp(24px, 6.6vw, 30px); line-height: 1.42; margin-top: 16px; }
+  .verdict { margin-top: 22px; padding-left: 16px; }
+  .verdict p { font-size: 18px; line-height: 1.75; }
+  .claim-text { font-size: 17px; line-height: 1.8; }
+  .claim-note { border-left: 2px solid var(--rule); padding-left: 14px; margin-top: 14px; padding-top: 0; }
+  .support-reason { font-size: 12.5px; line-height: 1.75; }
+  .reasoning { margin-top: 34px; }
+  .reasoning-body { padding-left: 18px; }
+  .roast { margin-top: 34px; padding: 20px 18px 22px; }
+  .roast p { font-size: 19.5px; line-height: 1.7; }
+  .conclusion-body p { font-size: 18px; line-height: 1.85; }
+  .questions { margin-top: 40px; }
+  .questions li { font-size: 15px; grid-template-columns: 26px 1fr; gap: 10px; }
+  .share { margin-top: 52px; }
+  .share-card { padding: 22px 18px 20px; }
+  .card-headline { font-size: 22px; padding-right: 0; }
+  .card-rows li { grid-template-columns: 22px 90px minmax(0, 1fr); gap: 8px; }
+  .card-rows .v { font-size: 12.5px; }
+  .card-seal { --seal: 42px; }
+  .legend { grid-template-columns: 1fr; gap: 10px; }
+  .legend div { grid-template-columns: 84px 1fr; gap: 10px; }
+  .source { grid-template-columns: 46px minmax(0, 1fr); gap: 14px; padding: 20px 0 22px; }
+  .foot { flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 56px; }
+  .back-pill { bottom: 18px; padding: 10px 16px; font-size: 12px; }
+}
+
+@media (max-width: 400px) {
+  :root { --pad: 17px; }
+  .card-rows li { grid-template-columns: 22px 1fr; }
+  .card-rows .k { grid-column: 2; }
+  .card-rows .v { grid-column: 2; }
+}
+
+/* ==========================================================================
+   动效偏好
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* ==========================================================================
+   打印
+   ========================================================================== */
+@page { size: A4; margin: 17mm 15mm 18mm; }
+
+@media print {
+  :root {
+    --paper: #fff; --paper-2: #f4f2ee; --paper-3: #fff;
+    --ink: #000; --ink-2: #1a1a1a; --muted: #3a3a3a;
+    --rule: #c8c8c8; --rule-2: #999; --red: #7d1a11;
+    --fs-body: 10.5pt;
+  }
+  html { scroll-behavior: auto; }
+  body { background: #fff; color: #000; font-size: 10.5pt; line-height: 1.7; }
+  .spine, .topbar, .issue-index, .back-pill, .share-cap, .skip, .method summary::before { display: none !important; }
+  .toc-panel { display: none !important; }
+  .page { margin-left: 0; }
+  .wrap { max-width: none; padding: 0; }
+  .prose, .body-text, .timeline, .actors, .reasoning, .questions, .conclusion-body, .duo { max-width: none; }
+  .duo { display: block; }
+  .claim-note { padding-top: 6px; }
+  .support-reason { max-width: 130mm; }
+  .hero-grid { grid-template-columns: 1fr; padding-top: 0; }
+  .hero-aside { display: none; }
+  .case-title { font-size: 25pt; line-height: 1.25; margin-top: 10pt; }
+  .hero-verdict { margin-top: 14pt; }
+  .hero-verdict p { font-size: 13pt; }
+  .hero-summary { font-size: 10.5pt; margin-top: 10pt; }
+  .sec { padding-top: 16mm; }
+  .sec-title { font-size: 17pt; margin-bottom: 6mm; }
+  .eyebrow { font-size: 8pt; }
+  .issue { padding-top: 14mm; break-inside: auto; }
+  .issue-q { font-size: 16pt; margin-top: 8pt; max-width: none; }
+  .verdict { margin-top: 10pt; }
+  .verdict p { font-size: 12pt; }
+  .claim-text { font-size: 11.5pt; max-width: none; }
+  .roast { margin-top: 8mm; background: #f4f2ee !important; padding: 12pt 14pt; max-width: none; break-inside: avoid; }
+  .roast p { font-size: 13pt; }
+  .conclusion-body p { font-size: 12pt; }
+  .share-card { max-width: none; break-inside: avoid; }
+  .card-headline { font-size: 15pt; }
+  .sources, .method { max-width: none; }
+  .source { break-inside: avoid; }
+  .src-url { word-break: break-all; }
+  details > *:not(summary) { display: block !important; }
+  .method summary {
+    display: block !important; font-family: var(--sans); font-size: 9.5pt;
+    font-weight: 600; letter-spacing: .06em; color: #000; padding: 5mm 0 2mm;
+  }
+  .method summary::before { display: none !important; }
+  h1, h2, h3 { break-after: avoid; }
+  .claim, .verdict, .questions li, .legend div { break-inside: avoid; }
+  .foot { margin-top: 12mm; padding-bottom: 0; }
+  a { color: #000; }
+  .cite { border-color: #999; color: #000; vertical-align: baseline; font-size: 8pt; }
+}
+
+</style>
+</head>
+<body id="top">
+<a class="skip" href="#main">跳到正文</a>
+<button class="back-pill" type="button" aria-label="返回刚才的阅读位置"><span class="k">返回</span>刚才的位置</button>
+
+<aside class="spine" aria-label="报告信息与目录">
+  <div class="spine-inner">
+    <div class="spine-brand">
+      <span class="spine-kicker">Cyber Judge</span>
+      <span class="spine-word">赛博判官</span>
+    </div>
+    <div class="spine-rule" aria-hidden="true"></div>
+    <div class="spine-meta">事件争议<br>材料截至 <b>2026-10-19</b><br>4 项争点 · 4 件证据</div>
+    <nav class="spine-nav" aria-label="本页目录">
+      <a href="#facts" data-nav="facts"><span class="n">00</span><span class="t">事实</span></a>
+      <a href="#issue-a-real" data-nav="issue-a-real"><span class="n">01</span><span class="t">画面真假</span></a>
+      <a href="#issue-a-ai" data-nav="issue-a-ai"><span class="n">02</span><span class="t">AI 定位</span></a>
+      <a href="#issue-a-control" data-nav="issue-a-control"><span class="n">03</span><span class="t">操控架构</span></a>
+      <a href="#issue-a-safety" data-nav="issue-a-safety"><span class="n">04</span><span class="t">安全安排</span></a>
+      <a href="#conclusion" data-nav="conclusion"><span class="n">05</span><span class="t">结论</span></a>
+      <a href="#sources" data-nav="sources"><span class="n">06</span><span class="t">证据</span></a>
+    </nav>
+    <div class="spine-foot">
+      <a class="spine-top" href="#top">↑ 页首</a>
+    </div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <a class="tb-mark" href="#top">赛博判官</a>
+  <span class="tb-meta">材料截至 2026-10-19</span>
+  <a class="toc-btn" href="#toc-panel">目录</a>
+</header>
+
+<nav class="toc-panel" id="toc-panel" aria-label="本页目录">
+  <div class="toc-head"><span>目录</span><a class="toc-close" href="#top">关闭</a></div>
+  <div class="toc-list">
+    <a href="#facts" data-nav="facts"><span class="n">00</span><span class="t">事实</span></a>
+      <a href="#issue-a-real" data-nav="issue-a-real"><span class="n">01</span><span class="t">画面真假</span></a>
+      <a href="#issue-a-ai" data-nav="issue-a-ai"><span class="n">02</span><span class="t">AI 定位</span></a>
+      <a href="#issue-a-control" data-nav="issue-a-control"><span class="n">03</span><span class="t">操控架构</span></a>
+      <a href="#issue-a-safety" data-nav="issue-a-safety"><span class="n">04</span><span class="t">安全安排</span></a>
+      <a href="#conclusion" data-nav="conclusion"><span class="n">05</span><span class="t">结论</span></a>
+      <a href="#sources" data-nav="sources"><span class="n">06</span><span class="t">证据</span></a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="wrap">
+    <main id="main">
+    <header class="hero">
+    <div class="toprail">
+      <div class="left">事件争议 · 公开材料分析</div>
+      <div class="right">材料截至 2026-10-19<span class="dot">/</span>4 项争点<span class="dot">/</span>4 件证据</div>
+    </div>
+    <div class="hero-grid">
+      <div class="case-head">
+        <h1 class="case-title">
+          <span class="case-subject">神奇阿宇飞行滑板</span>
+          <span class="q-line">质疑该打在哪个点上？</span>
+        </h1>
+        <div class="hero-verdict">
+          <span class="label">核心判断</span>
+          <p>“全是假的”证据弱，操控与宣传更值得问。</p>
+        </div>
+        <p class="hero-summary">神奇阿宇发布自制载人飞行滑板视频后，争论从画面真假扩展到 AI、飞控和安全。现有材料更支持装置确实载人飞过；技术质疑里，操控架构和宣传幅度的问题更有价值，把训练 AI 当成飞控来驳斥则打偏了。</p>
+      </div>
+      <aside class="hero-aside" aria-hidden="true">
+        <div class="seal hero-stamp"><span>赛</span><span>博</span><span>判</span><span>官</span></div>
+      </aside>
+    </div>
+    <nav class="issue-index" aria-label="争点索引">
+      <a href="#issue-a-real"><span class="n">01</span><span class="t">画面真假</span></a>
+      <a href="#issue-a-ai"><span class="n">02</span><span class="t">AI 定位</span></a>
+      <a href="#issue-a-control"><span class="n">03</span><span class="t">操控架构</span></a>
+      <a href="#issue-a-safety"><span class="n">04</span><span class="t">安全安排</span></a>
+    </nav>
+  </header>
+
+    <section class="sec" id="facts" data-nav="facts" aria-labelledby="facts-h">
+    <div class="eyebrow">事实</div>
+    <h2 class="sec-title" id="facts-h">起因与经过</h2>
+    <div class="prose">
+      <p class="body-text">10 月 15 日，神奇阿宇Ayu在 B 站发布《我造了一块会飞的滑板…》，展示制作、训练与户外飞行，并介绍手机辅助训练的环节。视频包含 STEPX 手机合作内容，简介也致谢地方部门对拍摄的支持。<a class="cite" id="c1" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a></p>
+      <p class="body-text">评论区出现 AI、绿幕、水纹和光影方面的疑问，作者随后明确否认 AI、特效及绿幕。另一类技术批评并不否认装置能飞，主要追问操控方式、飞控应用和安全。把这两类质疑混成一组，会误解这场争论。<a class="cite" id="c2" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a><a class="cite" id="c3" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+    </div>
+    <h3 class="sub-label">时间线</h3>
+    <ol class="timeline">
+      <li>
+        <div class="t-date">10 月 15 日</div>
+        <div class="t-body">
+          <p class="t-title">原视频发布</p>
+          <p class="t-text">展示制作、训练、户外飞行和手机辅助训练。<a class="cite" id="c4" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a></p>
+        </div>
+      </li>
+      <li>
+        <div class="t-date">10 月 16—17 日</div>
+        <div class="t-body">
+          <p class="t-title">作者回应真实性质疑</p>
+          <p class="t-text">先否认飞行画面使用 AI，随后进一步否认特效和绿幕。<a class="cite" id="c5" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a></p>
+        </div>
+      </li>
+      <li>
+        <div class="t-date">10 月 18 日</div>
+        <div class="t-body">
+          <p class="t-title">回复涉及 BF 固件</p>
+          <p class="t-text">作者称 BF 固件稳定，并称飞控介入很少。<a class="cite" id="c6" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a></p>
+        </div>
+      </li>
+    </ol>
+    <h3 class="sub-label">各方角色</h3>
+    <ul class="actors">
+      <li>
+        <span class="actor-name">神奇阿宇Ayu</span>
+        <span class="actor-role">原视频作者，展示装置并回应质疑。</span>
+      </li>
+      <li>
+        <span class="actor-name">评论区质疑者</span>
+        <span class="actor-role">提出画面真实性、操控与安全等不同问题，意见并不一致。</span>
+      </li>
+      <li>
+        <span class="actor-name">见吾丶</span>
+        <span class="actor-role">技术批评视频发布者，不否认装置能飞，关注控制叙事与安全。</span>
+      </li>
+      <li>
+        <span class="actor-name">其他视角搬运者</span>
+        <span class="actor-role">提供另一角度的现场画面，原拍摄者关系尚未核验。</span>
+      </li>
+    </ul>
+  </section>
+
+    <section class="issue" id="issue-a-real" data-nav="issue-a-real" aria-labelledby="q-a-real">
+    <div class="issue-bar">
+      <span class="issue-kicker">争点</span>
+      <span class="issue-num">01</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <h2 class="issue-q" id="q-a-real">飞行是实拍，还是 AI／绿幕做出来的？</h2>
+    <div class="verdict">
+      <span class="label">裁定</span>
+      <p>现有材料更支持真实载人飞行。“整片都是 AI／绿幕”的指控缺少有力证据。</p>
+    </div>
+    <div class="claims">
+      <h3 class="sub-label">各方论点与支持度</h3>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">部分评论者</p>
+    <p class="claim-text">画面、水纹或光影看起来不自然，因此怀疑造假。<a class="cite" id="c7" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持不足">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class=""></i><i class=""></i></span><span class="support-label" title="支持不足：提出了说法，但没有支撑它的关键证据。">支持不足</span>
+    </div>
+    <p class="support-reason">观感能提出问题，却尚未形成可复核的造假证据链。</p>
+  </div>
+</div>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">神奇阿宇Ayu</p>
+    <p class="claim-text">飞行画面真实，没有 AI、特效或绿幕。<a class="cite" id="c8" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c9" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a><a class="cite" id="c10" href="#source-A3" title="证据 A3：叽哩呱呱：游客景区实拍视频搬运（本次检索于 2026-10-19）" aria-label="证据 A3：叽哩呱呱：游客景区实拍视频搬运（本次检索于 2026-10-19）">A3</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持有限">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class=""></i></span><span class="support-label" title="支持有限：部分材料相符，关键连接仍依赖推断或来源单一。">支持有限</span>
+    </div>
+    <p class="support-reason">原片制作与飞行画面、另一角度搬运片段与其说法相符；搬运源头独立性仍未核验。</p>
+  </div>
+</div>
+    </div>
+    <div class="reasoning">
+      <h3 class="sub-label">为什么这样判断</h3>
+      <div class="reasoning-body">
+        <p>目前看到的材料包括制作与训练过程、户外飞行片段，以及另一角度的现场画面。综合这些材料，装置确实载人飞过是更有说服力的解释。另一角度视频来自搬运，尚未核验原拍摄者与团队的关系，因此它只作补充佐证。<a class="cite" id="c11" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c12" href="#source-A3" title="证据 A3：叽哩呱呱：游客景区实拍视频搬运（本次检索于 2026-10-19）" aria-label="证据 A3：叽哩呱呱：游客景区实拍视频搬运（本次检索于 2026-10-19）">A3</a></p>
+        <p>作者在 10 月 17 日已明确否认特效和绿幕。继续抓住较早的“没有 AI”，说他刻意没有否认绿幕，遗漏了后续回应。真实性质疑应转向具体镜头和可追溯原片。<a class="cite" id="c13" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a></p>
+      </div>
+    </div>
+    <blockquote class="roast">
+      <span class="label">判官短评</span>
+      <p>“看着像假的”是一条线索，还算不上一份证据链。</p>
+    </blockquote>
+  </section>
+
+    <section class="issue" id="issue-a-ai" data-nav="issue-a-ai" aria-labelledby="q-a-ai">
+    <div class="issue-bar">
+      <span class="issue-kicker">争点</span>
+      <span class="issue-num">02</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <h2 class="issue-q" id="q-a-ai">AI 在训练人，还是直接控制飞行器？</h2>
+    <div class="verdict">
+      <span class="label">裁定</span>
+      <p>原片相关段落展示的是训练辅助。直接用飞控实时性的要求否定它，批评对象发生了错位；训练效果是否被夸大则值得继续问。</p>
+    </div>
+    <div class="claims">
+      <h3 class="sub-label">各方论点与支持度</h3>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">原片约 5:15—6:05</p>
+    <p class="claim-text">手机取得姿态信息，通过耳机提醒调整，并生成训练报告。<a class="cite" id="c14" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持较强">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="support-label" title="支持较强：直接材料与主张相符，关键反证不足以推翻。">支持较强</span>
+    </div>
+    <p class="support-reason">已核对对应画面与叙事，能够确认原片展示和介绍的是这些功能；实际训练收益是另一个待验证问题。</p>
+  </div>
+</div>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">技术批评中的一条推论</p>
+    <p class="claim-text">AI 反馈存在延迟，因此相关辅助叙事不成立。<a class="cite" id="c15" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c16" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持不足">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class=""></i><i class=""></i></span><span class="support-label" title="支持不足：提出了说法，但没有支撑它的关键证据。">支持不足</span>
+    </div>
+    <p class="support-reason">需先区分高频姿态稳定与较慢的人体训练提示，两者对延迟的要求不同。</p>
+  </div>
+</div>
+    </div>
+    <div class="reasoning">
+      <h3 class="sub-label">为什么这样判断</h3>
+      <div class="reasoning-body">
+        <p>原片把手机、姿态信息、耳机提醒和训练报告连成一段训练故事。依据这段内容，更准确的讨论对象是“辅助人调整姿态”，而不是大模型直接发出每一次电机控制指令。<a class="cite" id="c17" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a></p>
+        <p>但训练故事是否展示了真实运行效果，仍有合理疑问。作者若提供实际提示记录和训练前后对照，会比再强调一次 AI 更有说服力。这是对宣传效果的有效追问。<a class="cite" id="c18" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c19" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+      </div>
+    </div>
+    <blockquote class="roast">
+      <span class="label">判官短评</span>
+      <p>先看 AI 被安排做什么，再判断它有没有做到。</p>
+    </blockquote>
+  </section>
+
+    <section class="issue" id="issue-a-control" data-nav="issue-a-control" aria-labelledby="q-a-control">
+    <div class="issue-bar">
+      <span class="issue-kicker">争点</span>
+      <span class="issue-num">03</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <h2 class="issue-q" id="q-a-control">用了开源飞控，作品就没有技术含量吗？</h2>
+    <div class="verdict">
+      <span class="label">裁定</span>
+      <p>这个否定过头了。更扎实的质疑是操控架构没有解释清楚：骑乘者、飞控与地面人员各自做了什么？</p>
+    </div>
+    <div class="claims">
+      <h3 class="sub-label">各方论点与支持度</h3>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">神奇阿宇Ayu</p>
+    <p class="claim-text">使用 BF 固件，并称飞控介入很少。<a class="cite" id="c20" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持有限">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class=""></i></span><span class="support-label" title="支持有限：部分材料相符，关键连接仍依赖推断或来源单一。">支持有限</span>
+    </div>
+    <p class="support-reason">作者原回复可定位，但这句概括没有完整说明控制通道与指令来源。</p>
+  </div>
+</div>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">技术批评中的观点</p>
+    <p class="claim-text">装置属于大型载重无人机，体感操控与创新叙事值得质疑。<a class="cite" id="c21" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持有限">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class=""></i></span><span class="support-label" title="支持有限：部分材料相符，关键连接仍依赖推断或来源单一。">支持有限</span>
+    </div>
+    <p class="support-reason">追问控制架构是有效问题；具体板卡、配置与控制机制还缺实物或运行资料核对。</p>
+  </div>
+</div>
+    </div>
+    <div class="reasoning">
+      <h3 class="sub-label">为什么这样判断</h3>
+      <div class="reasoning-body">
+        <p>使用成熟固件，仍可能包含结构集成、调试、训练和拍摄方面的工作。是否有算法原创，应看作者的具体主张和实现。把“用了开源”直接写成“没有贡献”，评价尺度过于粗糙。<a class="cite" id="c22" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a><a class="cite" id="c23" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+        <p>真正需要补齐的是油门、姿态、方向等指令由谁输入，身体动作怎样进入系统，地面人员承担什么角色。现有材料不足以给出完整答案。因此，要求清楚说明操控链路，比争论“纯原创还是拼装”更有价值。<a class="cite" id="c24" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c25" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a><a class="cite" id="c26" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+      </div>
+    </div>
+    <blockquote class="roast">
+      <span class="label">判官短评</span>
+      <p>开源不是零分理由，操控链路才是该拿出来的答卷。</p>
+    </blockquote>
+  </section>
+
+    <section class="issue" id="issue-a-safety" data-nav="issue-a-safety" aria-labelledby="q-a-safety">
+    <div class="issue-bar">
+      <span class="issue-kicker">争点</span>
+      <span class="issue-num">04</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <h2 class="issue-q" id="q-a-safety">视频的安全安排交代够了吗？</h2>
+    <div class="verdict">
+      <span class="label">裁定</span>
+      <p>原片有安全提示和训练防护画面。“完全没有安全措施”的说法站不住；对户外飞行的失效处置和人员隔离继续追问，理由充分。</p>
+    </div>
+    <div class="claims">
+      <h3 class="sub-label">各方论点与支持度</h3>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">原片画面与简介</p>
+    <p class="claim-text">清场拍摄、向相关部门报备、请勿模仿，并致谢拍摄支持。<a class="cite" id="c27" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="支持有限">
+      <span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class=""></i></span><span class="support-label" title="支持有限：部分材料相符，关键连接仍依赖推断或来源单一。">支持有限</span>
+    </div>
+    <p class="support-reason">可确认这些声明与提示存在；室内训练画面可见系挂线缆。公开文字并未具体说明全部户外安全安排。</p>
+  </div>
+</div>
+      <div class="duo claim">
+  <div class="claim-main">
+    <p class="speaker">安全质疑者</p>
+    <p class="claim-text">载人飞行应解释失效冗余、旁观者风险和救援安排。<a class="cite" id="c28" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a><a class="cite" id="c29" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+  </div>
+  <div class="claim-note">
+    <div class="support" data-support="规范判断">
+      <span class="support-mark" aria-hidden="true"></span><span class="support-label" title="规范判断：评价原则类主张，不按事实支持度计。">规范判断</span>
+    </div>
+    <p class="support-reason">载人装置的失效后果重大，宣传中的安全安排是值得说明的公共问题。</p>
+  </div>
+</div>
+    </div>
+    <div class="reasoning">
+      <h3 class="sub-label">为什么这样判断</h3>
+      <div class="reasoning-body">
+        <p>原片开头存在安全提示，训练段落也可见上方系挂线缆。这些内容应纳入评价，不能在批评中抹掉。另一方面，观众仍缺少足够信息理解户外飞行发生故障时怎样处置、现场人员如何隔离。<a class="cite" id="c30" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a></p>
+        <p>作者可以通过介绍风险控制和应急安排回应这些问题。已取得的报备文字没有交代具体程序与适用要求，本报告据此评价信息公开程度，不作合规认定。<a class="cite" id="c31" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c32" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+      </div>
+    </div>
+    <blockquote class="roast">
+      <span class="label">判官短评</span>
+      <p>“请勿模仿”提醒了观众，安全方案还要解释自己。</p>
+    </blockquote>
+  </section>
+
+    <section class="sec" id="conclusion" data-nav="conclusion" aria-labelledby="conclusion-h">
+    <div class="eyebrow">结论</div>
+    <h2 class="sec-title" id="conclusion-h">本庭判断</h2>
+    <div class="conclusion-body">
+      <p>目前更可信的结论是：真实飞行的解释比“全片造假”更有支持，作品也值得因制作与呈现受到肯定。与此同时，操控架构、AI 训练收益和户外风险控制仍值得作者具体回应。<a class="cite" id="c33" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c34" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a><a class="cite" id="c35" href="#source-A3" title="证据 A3：叽哩呱呱：游客景区实拍视频搬运（本次检索于 2026-10-19）" aria-label="证据 A3：叽哩呱呱：游客景区实拍视频搬运（本次检索于 2026-10-19）">A3</a><a class="cite" id="c36" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+        <p>这场争论里最有价值的技术批评，是把宣传拆成可核验的问题；最弱的部分，是只凭观感宣布造假，或把训练辅助改写成高频飞控再反驳。承认作品做成了什么，与追问它没讲清什么，可以同时成立。<a class="cite" id="c37" href="#source-A1" title="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）" aria-label="证据 A1：神奇阿宇Ayu：《我造了一块会飞的滑板…》（2026-10-15 17:30）">A1</a><a class="cite" id="c38" href="#source-A2" title="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）" aria-label="证据 A2：原视频评论区：作者回复与观众意见（回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05）">A2</a><a class="cite" id="c39" href="#source-A4" title="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）" aria-label="证据 A4：见吾丶：《【补档*4】飞行滑板 技术大讨论》（本次检索于 2026-10-19）">A4</a></p>
+    </div>
+    <div class="questions">
+      <h3 class="sub-label">最值得继续追问</h3>
+      <ol>
+        <li><span class="qn">01</span><span>骑乘者、飞控与地面人员各自承担哪些实际控制任务？</span></li>
+        <li><span class="qn">02</span><span>AI 提示在训练中实际怎样运行，效果有什么记录？</span></li>
+        <li><span class="qn">03</span><span>户外拍摄的失效处置与人员保护具体怎样安排？</span></li>
+      </ol>
+    </div>
+  </section>
+
+    <figure class="share" id="card">
+    <figcaption class="share-cap"><span>判词卡</span><span>截图即可分享</span></figcaption>
+    <div class="share-card">
+      <div class="card-top"><span>赛博判官 · 判词摘要</span><span class="date">材料截至 2026-10-19</span></div>
+      <p class="card-case">神奇阿宇飞行滑板</p>
+      <p class="card-headline">“全是假的”证据弱，操控与宣传更值得问。</p>
+      <ol class="card-rows">
+        <li>
+          <span class="n">01</span>
+          <span class="k">画面真假</span>
+          <span class="v">现有材料更支持真实载人飞行。</span>
+        </li>
+        <li>
+          <span class="n">02</span>
+          <span class="k">AI 定位</span>
+          <span class="v">原片相关段落展示的是训练辅助。</span>
+        </li>
+        <li>
+          <span class="n">03</span>
+          <span class="k">操控架构</span>
+          <span class="v">这个否定过头了。更扎实的质疑是操控架构没有解释清楚：骑乘者、飞控与地面人员各自做了什么？</span>
+        </li>
+        <li>
+          <span class="n">04</span>
+          <span class="k">安全安排</span>
+          <span class="v">原片有安全提示和训练防护画面。</span>
+        </li>
+      </ol>
+      <div class="card-foot">
+        <p class="meta">证据 <b>A1 A2 A3 A4</b><br>4 项争点 · 完整推理与来源见正文</p>
+        <div class="seal card-seal" aria-hidden="true"><span>赛</span><span>博</span><span>判</span><span>官</span></div>
+      </div>
+    </div>
+  </figure>
+
+    <section class="sec" id="sources" data-nav="sources" aria-labelledby="sources-h">
+    <div class="eyebrow">证据</div>
+    <h2 class="sec-title" id="sources-h">来源与采集</h2>
+    <h3 class="sub-label">支持度标注</h3>
+    <div class="legend">
+      <div><span class="k">支持较强</span><span class="d">直接材料与主张相符，关键反证不足以推翻。</span></div>
+      <div><span class="k">支持有限</span><span class="d">部分材料相符，关键连接仍依赖推断或来源单一。</span></div>
+      <div><span class="k">支持不足</span><span class="d">提出了说法，但没有支撑它的关键证据。</span></div>
+      <div><span class="k">有明确反证</span><span class="d">可核对材料与主张直接冲突。</span></div>
+      <div><span class="k">暂无法判断</span><span class="d">缺少决定性材料，现有解释难以区分。</span></div>
+      <div><span class="k">规范判断</span><span class="d">评价原则类主张，不按事实支持度计。</span></div>
+    </div>
+    <h3 class="sub-label">证据清单</h3>
+    <ol class="sources">
+    <li class="source" id="source-A1">
+      <div class="src-id">A1</div>
+      <div class="src-body">
+        <h3 class="src-title">神奇阿宇Ayu：《我造了一块会飞的滑板…》</h3>
+        <div class="src-meta">2026-10-15 17:30 · 作者原视频与简介</div>
+        <p class="src-note">核对元数据、简介、全片音频自动转写和关键画面。重点复看开头安全提示及约 5:15—6:05 的 AI 训练段落。自动转写有术语错误、后段误译和音乐干扰，未据此作逐字引语或逐帧鉴伪。</p>
+        <a class="src-url" href="https://www.bilibili.com/video/BV1KiJk67EQ9/" target="_blank" rel="noopener noreferrer">https://www.bilibili.com/video/BV1KiJk67EQ9/<span class="ext"> ↗</span></a>
+        <div class="src-refs"><span class="k">被引用于</span><a href="#c1">起因</a><a href="#c4">时间线</a><a href="#c8">争点 01</a><a href="#c14">争点 02</a><a href="#c24">争点 03</a><a href="#c27">争点 04</a><a href="#c33">结论</a></div>
+      </div>
+    </li>
+    <li class="source" id="source-A2">
+      <div class="src-id">A2</div>
+      <div class="src-body">
+        <h3 class="src-title">原视频评论区：作者回复与观众意见</h3>
+        <div class="src-meta">回复时间为 10 月 15—18 日；抓取于 10 月 19 日 20:05 · 原评论接口材料</div>
+        <p class="src-note">抓取 800 条主评论及 1517 条子回复，非全量、非随机样本。重要作者回复 rpid：317254107521（否认 AI）、317274654513（进一步否认特效／绿幕）、317402514321（BF 固件）。评论只能证明相应主张被提出。</p>
+        <a class="src-url" href="https://www.bilibili.com/video/BV1KiJk67EQ9/?comment_on=1" target="_blank" rel="noopener noreferrer">https://www.bilibili.com/video/BV1KiJk67EQ9/?comment_on=1<span class="ext"> ↗</span></a>
+        <div class="src-refs"><span class="k">被引用于</span><a href="#c2">起因</a><a href="#c5">时间线</a><a href="#c7">争点 01</a><a href="#c20">争点 03</a><a href="#c28">争点 04</a><a href="#c34">结论</a></div>
+      </div>
+    </li>
+    <li class="source" id="source-A3">
+      <div class="src-id">A3</div>
+      <div class="src-body">
+        <h3 class="src-title">叽哩呱呱：游客景区实拍视频搬运</h3>
+        <div class="src-meta">本次检索于 2026-10-19 · 明确标注搬运的现场视角</div>
+        <p class="src-note">阅读简介、元数据并抽查多处画面。其注明来源为另一平台“我在巴人河等你”；未核验源头与拍摄者关系，不能当作已认证独立见证。</p>
+        <a class="src-url" href="https://www.bilibili.com/video/BV1TZJe6cErf/" target="_blank" rel="noopener noreferrer">https://www.bilibili.com/video/BV1TZJe6cErf/<span class="ext"> ↗</span></a>
+        <div class="src-refs"><span class="k">被引用于</span><a href="#c10">争点 01</a><a href="#c35">结论</a></div>
+      </div>
+    </li>
+    <li class="source" id="source-A4">
+      <div class="src-id">A4</div>
+      <div class="src-body">
+        <h3 class="src-title">见吾丶：《【补档*4】飞行滑板 技术大讨论》</h3>
+        <div class="src-meta">本次检索于 2026-10-19 · 技术批评视频</div>
+        <p class="src-note">取得约 5 分 6 秒音频并转写。发布者明确不否认装置能飞，批评集中于控制叙事、安全与传播。本文使用概括，未核实其具体板卡、输出通道与控制理论断言。补档名称本身不证明下架原因。</p>
+        <a class="src-url" href="https://www.bilibili.com/video/BV1TqnE6pEve/" target="_blank" rel="noopener noreferrer">https://www.bilibili.com/video/BV1TqnE6pEve/<span class="ext"> ↗</span></a>
+        <div class="src-refs"><span class="k">被引用于</span><a href="#c3">起因</a><a href="#c16">争点 02</a><a href="#c21">争点 03</a><a href="#c29">争点 04</a><a href="#c36">结论</a></div>
+      </div>
+    </li>
+    </ol>
+    <details class="method">
+      <summary>采集与方法说明</summary>
+      <div class="method-body">已取得原片元数据、简介、全片音频自动转写、关键画面与作者回复，并查看游客视角搬运和技术批评。转写有错误，正文使用概括；未作逐帧取证。评论样本用于发现论点，不代表公众支持比例。本次仅修订表达，未新增检索。</div>
+    </details>
+  </section>
+    </main>
+    <footer class="foot">
+      <div><span class="mark">赛博判官</span> · 事件争议报告</div>
+      <div>材料截至 2026-10-19 · 静态页面，可离线阅读</div>
+    </footer>
+  </div>
+</div>
+
+<script>
+/* 赛博判官报告页 · 渐进增强脚本
+   无 JS 时：正文、目录锚点、证据锚点、折叠与方法说明均可读可用。
+   有 JS 时：增加阅读进度、目录当前位置、证据跳转后的返回按钮。
+*/
+(function () {
+  'use strict';
+
+  var doc = document;
+  var root = doc.documentElement;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 阅读进度 ---------- */
+  var spine = doc.querySelector('.spine');
+  var topbar = doc.querySelector('.topbar');
+
+  function setProgress() {
+    var max = root.scrollHeight - window.innerHeight;
+    var p = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+    var v = p.toFixed(2) + '%';
+    if (spine) spine.style.setProperty('--progress', v);
+    if (topbar) topbar.style.setProperty('--progress', v);
+  }
+
+  /* ---------- 目录当前位置 ---------- */
+  var sections = Array.prototype.slice.call(doc.querySelectorAll('[data-nav]'));
+  var links = Array.prototype.slice.call(doc.querySelectorAll('a[data-nav]'));
+  var currentId = null;
+
+  function setCurrent() {
+    if (!sections.length) return;
+    var line = window.innerHeight * 0.32;
+    var cur = sections[0].id;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].getBoundingClientRect().top <= line) cur = sections[i].id;
+    }
+    if (cur === currentId) return;
+    currentId = cur;
+    links.forEach(function (a) {
+      if (a.getAttribute('data-nav') === cur) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+  }
+
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      ticking = false;
+      setProgress();
+      setCurrent();
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  setProgress();
+  setCurrent();
+
+  /* ---------- 证据跳转后的返回按钮 ---------- */
+  var pill = doc.querySelector('.back-pill');
+  var lastY = null;
+
+  doc.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a.cite') : null;
+    if (!a || !pill) return;
+    lastY = window.scrollY;
+    window.setTimeout(function () {
+      if (lastY === null) return;
+      pill.setAttribute('data-show', '');
+    }, 40);
+  });
+
+  if (pill) {
+    pill.addEventListener('click', function () {
+      var y = lastY === null ? 0 : lastY;
+      pill.removeAttribute('data-show');
+      lastY = null;
+      window.scrollTo({ top: Math.max(0, y - 24), behavior: 'auto' });
+    });
+  }
+
+  doc.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (pill && pill.hasAttribute('data-show')) {
+        pill.removeAttribute('data-show');
+        lastY = null;
+      }
+      closeToc();
+    }
+  });
+
+  /* ---------- 移动端目录面板 ---------- */
+  var toc = doc.querySelector('.toc-panel');
+  var tocBtn = doc.querySelector('.toc-btn');
+
+  function closeToc() {
+    if (toc) toc.classList.remove('open');
+  }
+
+  if (tocBtn && toc) {
+    tocBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      toc.classList.add('open');
+    });
+    toc.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      if (a.classList.contains('toc-close')) {
+        e.preventDefault();
+        if (location.hash === '#toc-panel') history.pushState(null, '', location.pathname + location.search);
+      }
+      closeToc();
+    });
+    doc.addEventListener('click', function (e) {
+      if (!toc.classList.contains('open')) return;
+      if (toc.contains(e.target) || tocBtn.contains(e.target)) return;
+      closeToc();
+    });
+  }
+
+  /* ---------- 目录跳转：柔和滚动，保留地址栏锚点 ---------- */
+  doc.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[data-nav]') : null;
+    if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var href = a.getAttribute('href') || '';
+    if (href.charAt(0) !== '#') return;
+    var el = doc.querySelector(href);
+    if (!el) return;
+    e.preventDefault();
+    var bar = window.innerWidth <= 1020 ? 64 : 12;
+    var top = el.getBoundingClientRect().top + window.scrollY - bar;
+    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+    closeToc();
+    if (history.pushState) history.pushState(null, '', href);
+  });
+
+  /* ---------- 打印：展开全部折叠区 ---------- */
+  window.addEventListener('beforeprint', function () {
+    doc.querySelectorAll('details').forEach(function (d) { d.open = true; });
+  });
+})();
+
+</script>
+</body>
+</html>
